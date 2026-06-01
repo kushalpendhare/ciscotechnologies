@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cisco Technologies | Managed Services</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f5f7fa; color: #333; line-height: 1.6; }
+        header { background-color: #ffffff; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 22px; font-weight: bold; color: #049fd9; }
+        .nav-btn { background: none; border: none; font-size: 16px; font-weight: 600; margin-left: 20px; cursor: pointer; color: #555; }
+        .nav-btn.active, .nav-btn:hover { color: #049fd9; border-bottom: 2px solid #049fd9; }
+        main { max-width: 1000px; margin: 40px auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-top: 4px solid #049fd9; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        h1, h2 { color: #222; margin-bottom: 15px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+        .card { padding: 20px; border: 1px solid #eee; border-radius: 4px; }
+        footer { text-align: center; padding: 20px; color: #999; font-size: 14px; margin-top: 40px; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">Cisco Technologies-always there for help</div>
+        <nav>
+            <button class="nav-btn active" onclick="switchTab('home')">Home</button>
+            <button class="nav-btn" onclick="switchTab('solutions')">Solutions</button>
+            <button class="nav-btn" onclick="switchTab('support')">Support</button>
+            <button class="nav-btn" onclick="switchTab('contact')">Contact Us</button>
+        </nav>
+    </header>
+    <main>
+        <div id="home" class="tab-content active">
+            <h1>Next-Gen Managed Infrastructure</h1>
+            <p>Automated cloud environments and elite operational uptime optimized for modern enterprises.</p>
+        </div>
+        <div id="solutions" class="tab-content">
+            <h2>Our Enterprise Architecture Solutions</h2>
+            <div class="grid">
+                <div class="card"><h3>Cloud Delivery</h3><p>Seamless transition designs across hybrid networks.</p></div>
+                <div class="card"><h3>Containerization</h3><p>Migrating legacy architectures into scalable Docker stacks.</p></div>
+            </div>
+        </div>
+        <div id="support" class="tab-content">
+            <h2>Technical Support Center</h2>
+            <p>Priority 1 events are triaged within 15 minutes by our global engineering teams.</p>
+        </div>
+        <div id="contact" class="tab-content">
+            <h2>Contact Enterprise Engineering</h2>
+            <p>Submit your architecture specifications to our routing team to begin your consultation.</p>
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2026 Cisco Technologies. Global Delivery Center: Pune, India | Node: hq-linux-01</p>
+    </footer>
+    <script>
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+    </script>
+</body>
+</html>
