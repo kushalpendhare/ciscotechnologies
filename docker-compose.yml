@@ -27,25 +27,15 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./:/usr/share/nginx/html  # This maps your local code just like yesterday
+      - ./:/usr/share/nginx/html
     depends_on:
       - db
     networks:
       - cisco-net
 
-# ------------------------------------
-# 3. Persistent Storage & Networks
-# ------------------------------------
-volumes:
-  pgdata: # This ensures your database doesn't delete itself if the container restarts
-
-networks:
-  cisco-net:
-    driver: bridge # This creates a private LAN just for these two containers
-    
-# ------------------------------------
-# 4. The API Layer (Python/Flask)
-# ------------------------------------
+  # ------------------------------------
+  # 3. The API Layer (Python/Flask)
+  # ------------------------------------
   api:
     build: ./api
     container_name: cisco-api
@@ -56,3 +46,13 @@ networks:
       - db
     networks:
       - cisco-net
+
+# ------------------------------------
+# 4. Persistent Storage & Networks
+# ------------------------------------
+volumes:
+  pgdata:
+
+networks:
+  cisco-net:
+    driver: bridge
