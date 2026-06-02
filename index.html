@@ -291,7 +291,7 @@
 
             try {
                 // Send the JSON payload to the Python API
-                const response = await fetch('http://${window.location.hostname}:5000/api/ticket', {
+                const response = await fetch(`http://${window.location.hostname}:5000/api/ticket`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
