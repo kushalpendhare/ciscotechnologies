@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  # ------------------------------------
+  # 1. The Database Layer (PostgreSQL)
+  # ------------------------------------
+  db:
+    image: postgres:15-alpine
+    container_name: cisco-db
+    restart: always
+    environment:
+      POSTGRES_USER: cisco_admin
+      POSTGRES_PASSWORD: Password123!
+      POSTGRES_DB: cisco_architecture
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - cisco-net
+
+  # ------------------------------------
+  # 2. The Web Layer (Nginx Frontend)
+  # ------------------------------------
+  web:
+    image: nginx:alpine
+    container_name: cisco-web
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ./:/usr/share/nginx/html  # This maps your local code just like yesterday
+    depends_on:
+      - db
+    networks:
+      - cisco-net
+
+# ------------------------------------
+# 3. Persistent Storage & Networks
+# ------------------------------------
+volumes:
+  pgdata: # This ensures your database doesn't delete itself if the container restarts
+
+networks:
+  cisco-net:
+    driver: bridge # This creates a private LAN just for these two containers
