@@ -22,43 +22,44 @@
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Advanced Hero Section with Data Center Background */
+        /* Advanced Hero Section */
         .hero { 
             background: linear-gradient(rgba(4, 159, 217, 0.85), rgba(0, 95, 135, 0.95)), url('https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&q=80&w=2000') center/cover; 
-            color: white; 
-            padding: 80px 40px; 
-            border-radius: 12px; 
-            text-align: center; 
-            margin-bottom: 40px; 
-            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            color: white; padding: 80px 40px; border-radius: 12px; text-align: center; margin-bottom: 40px; box-shadow: 0 10px 20px rgba(0,0,0,0.15);
         }
         .hero h1 { font-size: 42px; margin-bottom: 20px; font-weight: 700; }
         .hero p { font-size: 18px; max-width: 800px; margin: 0 auto; line-height: 1.8; }
+
+        /* Story Section (Home) */
+        .story-section { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; margin-bottom: 40px; }
+        .story-img { width: 100%; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .story-text h2 { font-size: 28px; color: #222; margin-bottom: 15px; border-left: 5px solid #049fd9; padding-left: 15px; }
+        
+        /* Accordion (Home) */
+        .accordion { background-color: #fff; color: #444; cursor: pointer; padding: 18px; width: 100%; border: none; text-align: left; outline: none; font-size: 16px; font-weight: bold; transition: 0.4s; border-bottom: 1px solid #ddd; }
+        .accordion:hover, .accordion.active { background-color: #f1f8fc; color: #049fd9; }
+        .accordion:after { content: '\002B'; color: #777; font-weight: bold; float: right; margin-left: 5px; }
+        .accordion.active:after { content: "\2212"; }
+        .panel { padding: 0 18px; background-color: white; max-height: 0; overflow: hidden; transition: max-height 0.2s ease-out; }
+        .panel p { padding: 15px 0; color: #555; }
 
         /* Grid Layouts */
         .section-title { font-size: 28px; color: #222; margin-bottom: 25px; border-left: 5px solid #049fd9; padding-left: 15px; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; margin-bottom: 40px; }
         
         /* Interactive Cards */
-        .card { background: white; padding: 35px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: transform 0.3s, box-shadow 0.3s; border-top: 4px solid #eaeaea; }
+        .card { background: white; padding: 35px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: transform 0.3s, box-shadow 0.3s; border-top: 4px solid #eaeaea; cursor: pointer; }
         .card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); border-top-color: #049fd9; }
         .card h3 { margin-bottom: 15px; color: #111; font-size: 20px; }
         .card p { color: #666; font-size: 15px; }
 
-        /* Contact Section specific layout */
-        .contact-wrapper { display: grid; grid-template-columns: 2fr 1fr; gap: 40px; }
-        form { background: white; padding: 40px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #444; }
-        .form-group input, .form-group textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 16px; font-family: inherit; }
-        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #049fd9; }
-        .submit-btn { background-color: #049fd9; color: white; border: none; padding: 14px 28px; font-size: 16px; font-weight: bold; border-radius: 6px; cursor: pointer; transition: background 0.3s; width: 100%; }
-        .submit-btn:hover { background-color: #005f87; }
-        
-        .corporate-info { background: #222; color: #fff; padding: 40px; border-radius: 10px; }
-        .corporate-info h3 { color: #049fd9; margin-bottom: 20px; }
-        .corporate-info p { margin-bottom: 15px; font-size: 15px; color: #ccc; }
-        .corporate-info strong { color: #fff; }
+        /* Solution Detail View */
+        .solution-detail { display: none; background: white; padding: 40px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); animation: fadeIn 0.3s ease-in-out; }
+        .back-btn { background: none; border: 1px solid #049fd9; color: #049fd9; padding: 8px 16px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-bottom: 20px; transition: 0.3s; }
+        .back-btn:hover { background: #049fd9; color: white; }
+        .offerings-list { margin-top: 20px; list-style: none; }
+        .offerings-list li { background: #f9f9f9; margin-bottom: 10px; padding: 20px; border-left: 4px solid #049fd9; border-radius: 4px; }
+        .offerings-list h4 { color: #222; font-size: 18px; margin-bottom: 5px; }
 
         /* Global Footer */
         footer { background-color: #1a1a1a; color: #888; text-align: center; padding: 30px; font-size: 14px; margin-top: 60px; }
@@ -72,8 +73,8 @@
             <nav>
                 <button class="nav-btn active" onclick="switchTab('home')">Home</button>
                 <button class="nav-btn" onclick="switchTab('solutions')">Solutions</button>
-                <button class="nav-btn" onclick="switchTab('support')">Support</button>
-                <button class="nav-btn" onclick="switchTab('contact')">Contact Us</button>
+                <button class="nav-btn" onclick="switchTab('support')">Support (Coming Soon)</button>
+                <button class="nav-btn" onclick="switchTab('contact')">Contact Us (Coming Soon)</button>
             </nav>
         </div>
     </header>
@@ -85,88 +86,102 @@
                 <p>Powering global enterprises with automated cloud environments, secure AI integrations, and elite operational uptime delivered straight from our tier-4 data centers.</p>
             </section>
             
-            <h2 class="section-title">Core Competencies</h2>
-            <div class="grid">
-                <div class="card">
-                    <h3>99.999% Availability SLAs</h3>
-                    <p>Continuous monitoring and automated failover architectures ensure your critical applications never go offline.</p>
+            <section class="story-section">
+                <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=800" alt="Global Network" class="story-img">
+                <div class="story-text">
+                    <h2>Our Corporate Story</h2>
+                    <p style="margin-bottom: 20px; color: #555;">Founded with a vision to bridge the gap between legacy infrastructure and modern DevOps, Cisco Technologies PVT LTD has evolved into a premier architectural consulting firm. We don't just build networks; we engineer digital ecosystems that allow enterprises to scale globally without friction.</p>
+                    
+                    <button class="accordion">Our Leadership Vision</button>
+                    <div class="panel">
+                        <p>Our CEO believes that the future of enterprise IT lies in decoupled architectures. By moving away from monolithic designs, we empower businesses to be agile, resilient, and ready for AI integration.</p>
+                    </div>
+
+                    <button class="accordion">Global Data Centers</button>
+                    <div class="panel">
+                        <p>We operate out of Tier-4 facilities equipped with N+2 redundancy. Our Texas headquarters serves as the central command for routing global BGP traffic and managing containerized workloads.</p>
+                    </div>
+
+                    <button class="accordion">Commitment to Open Source</button>
+                    <div class="panel">
+                        <p>We heavily leverage open-source container orchestration (Docker/Kubernetes) and Linux ecosystems, ensuring our clients are never locked into proprietary vendor constraints.</p>
+                    </div>
                 </div>
-                <div class="card">
-                    <h3>DevOps Native Delivery</h3>
-                    <p>Infrastructure-as-Code paradigms built directly into your CI/CD pipelines for zero-touch provisioning.</p>
-                </div>
-                <div class="card">
-                    <h3>Global Edge Network</h3>
-                    <p>Low-latency traffic routing leveraging localized Points of Presence (PoPs) worldwide.</p>
-                </div>
-            </div>
+            </section>
         </div>
 
         <div id="solutions" class="tab-content">
-            <h2 class="section-title">Enterprise Architecture Solutions</h2>
-            <div class="grid">
-                <div class="card">
-                    <h3>Cloud Migration & Hybrid IaaS</h3>
-                    <p>Seamless transition designs integrating your on-premise infrastructure with AWS, Azure, and Google Cloud perimeters.</p>
+            <div id="solutions-main">
+                <h2 class="section-title">Select a Solution Architecture</h2>
+                <div class="grid">
+                    <div class="card" onclick="showDetail('cloud')">
+                        <h3>Cloud Migration & Hybrid IaaS</h3>
+                        <p>Seamless transition designs integrating your on-premise infrastructure with AWS, Azure, and Google Cloud perimeters. Click to view offerings.</p>
+                    </div>
+                    <div class="card" onclick="showDetail('ai')">
+                        <h3>Artificial Intelligence (AI)</h3>
+                        <p>Deploy private, secure Large Language Models (LLMs) and machine learning pipelines tailored to your proprietary data. Click to view offerings.</p>
+                    </div>
+                    <div class="card" onclick="showDetail('ucaas')">
+                        <h3>UCaaS & CCaaS</h3>
+                        <p>Unified Communications and Contact Center architectures built on Webex and legacy integrations. Click to view offerings.</p>
+                    </div>
                 </div>
-                <div class="card">
-                    <h3>Artificial Intelligence (AI)</h3>
-                    <p>Deploy private, secure Large Language Models (LLMs) and machine learning pipelines tailored to your proprietary data.</p>
-                </div>
-                <div class="card">
-                    <h3>UCaaS & CCaaS</h3>
-                    <p>Unified Communications and Contact Center architectures. Next-generation voice, video, and omnichannel routing built on Webex and legacy integrations.</p>
-                </div>
-                <div class="card">
-                    <h3>Zero Trust Security</h3>
-                    <p>Identity-driven micro-segmentation and continuous threat analysis protecting your workloads at the container level.</p>
-                </div>
+            </div>
+
+            <div id="detail-cloud" class="solution-detail">
+                <button class="back-btn" onclick="hideDetail()">← Back to Solutions</button>
+                <h2 class="section-title">Cloud Migration Offerings</h2>
+                <p>We provide full-stack migration services across the top three global cloud providers.</p>
+                <ul class="offerings-list">
+                    <li>
+                        <h4>AWS Landing Zone Setup</h4>
+                        <p>Automated VPC provisioning, Transit Gateway routing, and IAM security policies using Terraform.</p>
+                    </li>
+                    <li>
+                        <h4>Azure Hybrid Active Directory</h4>
+                        <p>Seamless integration of on-premise AD with Entra ID (Azure AD) for single sign-on (SSO) across enterprise apps.</p>
+                    </li>
+                    <li>
+                        <h4>GCP Kubernetes Migration</h4>
+                        <p>Refactoring legacy monolithic applications into microservices running on Google Kubernetes Engine (GKE).</p>
+                    </li>
+                </ul>
+            </div>
+
+            <div id="detail-ai" class="solution-detail">
+                <button class="back-btn" onclick="hideDetail()">← Back to Solutions</button>
+                <h2 class="section-title">AI & Data Pipelines</h2>
+                <ul class="offerings-list">
+                    <li>
+                        <h4>Private Enterprise LLMs</h4>
+                        <p>Deployment of offline, secure Llama 3 models on local GPUs to ensure zero data leakage to public AI providers.</p>
+                    </li>
+                    <li>
+                        <h4>RAG Architecture (Retrieval-Augmented Generation)</h4>
+                        <p>Connecting your corporate SharePoint and SQL databases to an AI chatbot for internal knowledge querying.</p>
+                    </li>
+                </ul>
+            </div>
+
+            <div id="detail-ucaas" class="solution-detail">
+                <button class="back-btn" onclick="hideDetail()">← Back to Solutions</button>
+                <h2 class="section-title">Unified Communications Offerings</h2>
+                <ul class="offerings-list">
+                    <li>
+                        <h4>Webex Calling Migration</h4>
+                        <p>Porting legacy PBX extensions to the Webex Cloud, including SIP Trunk routing and auto-attendant configuration.</p>
+                    </li>
+                    <li>
+                        <h4>Omnichannel Contact Center</h4>
+                        <p>Integrating Webex Contact Center with Salesforce CRM for intelligent skills-based routing via Voice, Chat, and SMS.</p>
+                    </li>
+                </ul>
             </div>
         </div>
 
-        <div id="support" class="tab-content">
-            <h2 class="section-title">Global Technical Assistance Center (TAC)</h2>
-            <div class="grid" style="margin-bottom: 30px;">
-                <div class="card">
-                    <h3>Incident Management</h3>
-                    <p>Open a ticket with our routing team. Priority 1 (Network Down) events are triaged and assigned to a specialized engineer within 15 minutes.</p>
-                </div>
-                <div class="card">
-                    <h3>Knowledge Base & Playbooks</h3>
-                    <p>Access standardized system documentation, disaster recovery guides, and DevOps pipeline architectures.</p>
-                </div>
-            </div>
-        </div>
-
-        <div id="contact" class="tab-content">
-            <h2 class="section-title">Contact Enterprise Engineering</h2>
-            <div class="contact-wrapper">
-                <form onsubmit="event.preventDefault(); alert('Inquiry logged. A solutions architect will contact you shortly.');">
-                    <div class="form-group">
-                        <label for="name">Full Name</label>
-                        <input type="text" id="name" required placeholder="Jane Doe">
-                    </div>
-                    <div class="form-group">
-                        <label for="email">Corporate Email</label>
-                        <input type="email" id="email" required placeholder="jane.doe@enterprise.com">
-                    </div>
-                    <div class="form-group">
-                        <label for="msg">Architecture Requirements</label>
-                        <textarea id="msg" rows="6" required placeholder="Describe your infrastructure needs..."></textarea>
-                    </div>
-                    <button type="submit" class="submit-btn">Submit Architecture Request</button>
-                </form>
-
-                <div class="corporate-info">
-                    <h3>Global Headquarters</h3>
-                    <p><strong>Cisco Technologies PVT LTD</strong></p>
-                    <p>12515 Research Blvd<br>Building 4, Suite 400<br>Austin, Texas 78759<br>United States</p>
-                    <hr style="border-color: #444; margin: 20px 0;">
-                    <p><strong>Enterprise Sales:</strong><br>+1 (800) 553-6387</p>
-                    <p><strong>TAC Support:</strong><br>+1 (800) 553-2447</p>
-                </div>
-            </div>
-        </div>
+        <div id="support" class="tab-content"><h2 class="section-title">Under Construction (Phase 2)</h2></div>
+        <div id="contact" class="tab-content"><h2 class="section-title">Under Construction (Phase 2)</h2></div>
     </main>
 
     <footer>
@@ -174,12 +189,40 @@
     </footer>
 
     <script>
-        // Core Tab-Switching Logic
+        // Tab-Switching Logic
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
             event.currentTarget.classList.add('active');
+            // Reset solution views if navigating away
+            if(tabId !== 'solutions') hideDetail();
+        }
+
+        // Accordion Logic for Home Page
+        var acc = document.getElementsByClassName("accordion");
+        for (var i = 0; i < acc.length; i++) {
+            acc[i].addEventListener("click", function() {
+                this.classList.toggle("active");
+                var panel = this.nextElementSibling;
+                if (panel.style.maxHeight) {
+                    panel.style.maxHeight = null;
+                } else {
+                    panel.style.maxHeight = panel.scrollHeight + "px";
+                } 
+            });
+        }
+
+        // Drill-Down Logic for Solutions Page
+        function showDetail(id) {
+            document.getElementById('solutions-main').style.display = 'none';
+            document.querySelectorAll('.solution-detail').forEach(detail => detail.style.display = 'none');
+            document.getElementById('detail-' + id).style.display = 'block';
+        }
+
+        function hideDetail() {
+            document.querySelectorAll('.solution-detail').forEach(detail => detail.style.display = 'none');
+            document.getElementById('solutions-main').style.display = 'block';
         }
     </script>
 </body>
