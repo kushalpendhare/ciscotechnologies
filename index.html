@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cisco Technologies | Global Enterprise Infrastructure</title>
     <style>
+        /* Modern Form UX */
+        .form-control { width: 100%; padding: 14px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; transition: border-color 0.3s; box-sizing: border-box; }
+        .form-control:focus { border-color: #049fd9; outline: none; }
+
         /* Base Reset and Typography */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; color: #333; line-height: 1.6; }
@@ -185,28 +189,35 @@
             <p style="margin-bottom: 30px; color: #555;">Open a service request with our global engineering team. Priority 1 (Network Down) events are automatically routed to the on-call Site Reliability Engineer.</p>
             
             <div class="contact-wrapper">
+                <!-- Support Ticket Form -->
                 <form id="supportForm" onsubmit="submitTicket(event)">
-                    <div class="form-group">
-                        <label for="reqName">Requester Name</label>
-                        <input type="text" id="reqName" required placeholder="Jane Doe">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 15px;">
+                        <div>
+                            <label for="reqName" style="display: block; margin-bottom: 5px; font-weight: bold;">Requester Name</label>
+                            <input type="text" id="reqName" class="form-control" required placeholder="Jane Doe">
+                        </div>
+                        <div>
+                            <label for="reqPhone" style="display: block; margin-bottom: 5px; font-weight: bold;">Contact Number</label>
+                            <input type="tel" id="reqPhone" class="form-control" required placeholder="+1 (555) 000-0000">
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="reqEmail">Corporate Email</label>
-                        <input type="email" id="reqEmail" required placeholder="jane.doe@enterprise.com">
+                    <div style="margin-bottom: 15px;">
+                        <label for="reqEmail" style="display: block; margin-bottom: 5px; font-weight: bold;">Corporate Email</label>
+                        <input type="email" id="reqEmail" class="form-control" required placeholder="jane.doe@enterprise.com">
                     </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                        <div class="form-group">
-                            <label for="ticketSeverity">Severity Level</label>
-                            <select id="ticketSeverity" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 16px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 15px;">
+                        <div>
+                            <label for="ticketSeverity" style="display: block; margin-bottom: 5px; font-weight: bold;">Severity Level</label>
+                            <select id="ticketSeverity" class="form-control" required>
                                 <option value="P4">P4 - Low (Information Request)</option>
                                 <option value="P3">P3 - Normal (Degraded Performance)</option>
                                 <option value="P2">P2 - High (Partial Outage)</option>
                                 <option value="P1">P1 - Critical (System Down)</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label for="ticketCategory">Architecture Category</label>
-                            <select id="ticketCategory" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 16px;">
+                        <div>
+                            <label for="ticketCategory" style="display: block; margin-bottom: 5px; font-weight: bold;">Architecture Category</label>
+                            <select id="ticketCategory" class="form-control" required>
                                 <option value="Cloud">Cloud & IaaS</option>
                                 <option value="Network">BGP & Edge Networking</option>
                                 <option value="UCaaS">Voice & UCaaS</option>
@@ -214,13 +225,12 @@
                             </select>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label for="ticketDesc">Issue Description</label>
-                        <textarea id="ticketDesc" rows="5" required placeholder="Please provide specific error logs or behavioral symptoms..."></textarea>
+                    <div style="margin-bottom: 20px;">
+                        <label for="ticketDesc" style="display: block; margin-bottom: 5px; font-weight: bold;">Issue Description</label>
+                        <textarea id="ticketDesc" class="form-control" rows="5" required placeholder="Please provide specific error logs or behavioral symptoms..."></textarea>
                     </div>
-                    <button type="submit" class="submit-btn">Generate Support Ticket</button>
+                    <button type="submit" class="submit-btn" style="width: 100%; padding: 15px; font-size: 18px;">Submit Service Request</button>
                 </form>
-
                 <div id="successMessage" style="display: none; background: #d4edda; color: #155724; padding: 30px; border-radius: 8px; border: 1px solid #c3e6cb; margin-bottom: 20px; text-align: center;">
                         <h3 style="margin-bottom: 15px; font-size: 24px;">✅ Ticket Submitted Successfully</h3>
                         <p id="successText" style="font-size: 18px; font-weight: bold;"></p>
@@ -312,9 +322,10 @@
         async function submitTicket(event) {
             event.preventDefault(); 
             
-            const ticketPayload = {
+           const ticketPayload = {
                 requester: document.getElementById('reqName').value,
                 email: document.getElementById('reqEmail').value,
+                phone: document.getElementById('reqPhone').value, // NEW FIELD
                 severity: document.getElementById('ticketSeverity').value,
                 category: document.getElementById('ticketCategory').value,
                 description: document.getElementById('ticketDesc').value
