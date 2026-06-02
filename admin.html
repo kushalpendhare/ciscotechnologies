@@ -54,7 +54,7 @@
     <script>
         async function loadTickets() {
             try {
-                const response = await fetch(`http://${window.location.hostname}:5000/api/tickets`);
+                const response = await fetch(`/api/tickets`);
                 const tickets = await response.json();
                 const tableBody = document.getElementById('ticketTableBody');
                 tableBody.innerHTML = ''; 
@@ -81,7 +81,7 @@
 
         async function updateStatus(ticketId, newStatus) {
             try {
-                const response = await fetch(`http://${window.location.hostname}:5000/api/ticket/update`, {
+                const response = await fetch(`api/ticket/update`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ id: ticketId, status: newStatus })
