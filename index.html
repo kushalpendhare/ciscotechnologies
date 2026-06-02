@@ -180,7 +180,59 @@
             </div>
         </div>
 
-        <div id="support" class="tab-content"><h2 class="section-title">Under Construction (Phase 2)</h2></div>
+        <div id="support" class="tab-content">
+            <h2 class="section-title">Technical Assistance Center (TAC)</h2>
+            <p style="margin-bottom: 30px; color: #555;">Open a service request with our global engineering team. Priority 1 (Network Down) events are automatically routed to the on-call Site Reliability Engineer.</p>
+            
+            <div class="contact-wrapper">
+                <form id="supportForm" onsubmit="submitTicket(event)">
+                    <div class="form-group">
+                        <label for="reqName">Requester Name</label>
+                        <input type="text" id="reqName" required placeholder="Jane Doe">
+                    </div>
+                    <div class="form-group">
+                        <label for="reqEmail">Corporate Email</label>
+                        <input type="email" id="reqEmail" required placeholder="jane.doe@enterprise.com">
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="form-group">
+                            <label for="ticketSeverity">Severity Level</label>
+                            <select id="ticketSeverity" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 16px;">
+                                <option value="P4">P4 - Low (Information Request)</option>
+                                <option value="P3">P3 - Normal (Degraded Performance)</option>
+                                <option value="P2">P2 - High (Partial Outage)</option>
+                                <option value="P1">P1 - Critical (System Down)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="ticketCategory">Architecture Category</label>
+                            <select id="ticketCategory" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 16px;">
+                                <option value="Cloud">Cloud & IaaS</option>
+                                <option value="Network">BGP & Edge Networking</option>
+                                <option value="UCaaS">Voice & UCaaS</option>
+                                <option value="AI">AI Pipelines</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="ticketDesc">Issue Description</label>
+                        <textarea id="ticketDesc" rows="5" required placeholder="Please provide specific error logs or behavioral symptoms..."></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn">Generate Support Ticket</button>
+                </form>
+
+                <div class="corporate-info">
+                    <h3>Service Level Agreements (SLA)</h3>
+                    <p><strong>P1 Critical:</strong> 15 Minute Response</p>
+                    <p><strong>P2 High:</strong> 1 Hour Response</p>
+                    <p><strong>P3 Normal:</strong> 4 Hour Response</p>
+                    <p><strong>P4 Low:</strong> Next Business Day</p>
+                    <hr style="border-color: #444; margin: 20px 0;">
+                    <p><em>* Future State: Tickets will be automatically synced to our global ServiceNow (SNOW) instance for ITIL tracking.</em></p>
+                </div>
+            </div>
+        </div>
+
         <div id="contact" class="tab-content"><h2 class="section-title">Under Construction (Phase 2)</h2></div>
     </main>
 
@@ -223,6 +275,27 @@
         function hideDetail() {
             document.querySelectorAll('.solution-detail').forEach(detail => detail.style.display = 'none');
             document.getElementById('solutions-main').style.display = 'block';
+        }
+        // API Payload Simulation for Support Ticket
+        function submitTicket(event) {
+            event.preventDefault(); // Stop page reload
+            
+            // Package the data into a JSON object
+            const ticketPayload = {
+                requester: document.getElementById('reqName').value,
+                email: document.getElementById('reqEmail').value,
+                severity: document.getElementById('ticketSeverity').value,
+                category: document.getElementById('ticketCategory').value,
+                description: document.getElementById('ticketDesc').value,
+                timestamp: new Date().toISOString()
+            };
+
+            // Simulate sending to the Python API
+            console.log("Transmitting payload to API:", ticketPayload);
+            
+            alert("Ticket successfully captured!\n\nIn our next sprint, this JSON payload will be sent to the Python API to be saved in PostgreSQL:\n\n" + JSON.stringify(ticketPayload, null, 2));
+            
+            document.getElementById('supportForm').reset();
         }
     </script>
 </body>
