@@ -47,8 +47,21 @@ services:
     networks:
       - cisco-net
 
+  # ------------------------------------
+  # 4. The Cloudflare Edge Tunnel
+  # ------------------------------------
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: cisco-tunnel
+    restart: always
+    environment:
+      - TUNNEL_TOKEN=eyJhIjoiOWZkODA2YzExMDhiZGY1Mzc4Zjg4OGM1MWVlZGM1MmIiLCJ0IjoiOGJlOWI1NzQtODU1OS00YWUwLWJmMGUtYjQyMmE4NDE2NzRlIiwicyI6Ik1UazNZemcwTXpRdE5HRTRZeTAwTldJekxUaG1OamN0Wm1RNFpqSmpNall5WXpCbCJ9
+    command: tunnel --no-autoupdate run
+    networks:
+      - cisco-net
+
 # ------------------------------------
-# 4. Persistent Storage & Networks
+# 5. Persistent Storage & Networks
 # ------------------------------------
 volumes:
   pgdata:
