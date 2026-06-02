@@ -332,7 +332,7 @@
             };
 
             try {
-                const response = await fetch(`http://${window.location.hostname}:5000/api/ticket`, {
+                const response = await fetch(`api/ticket`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(ticketPayload)

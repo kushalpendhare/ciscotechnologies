@@ -28,10 +28,14 @@ services:
       - "80:80"
     volumes:
       - ./:/usr/share/nginx/html
+      # Add this line below to load the reverse proxy rules:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
     depends_on:
       - db
     networks:
       - cisco-net
+    depends_on:
+      - api
 
   # ------------------------------------
   # 3. The API Layer (Python/Flask)
