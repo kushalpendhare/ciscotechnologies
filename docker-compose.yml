@@ -42,3 +42,17 @@ volumes:
 networks:
   cisco-net:
     driver: bridge # This creates a private LAN just for these two containers
+    
+# ------------------------------------
+# 4. The API Layer (Python/Flask)
+# ------------------------------------
+  api:
+    build: ./api
+    container_name: cisco-api
+    restart: always
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+    networks:
+      - cisco-net

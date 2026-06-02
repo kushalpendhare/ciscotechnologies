@@ -73,7 +73,7 @@
             <nav>
                 <button class="nav-btn active" onclick="switchTab('home')">Home</button>
                 <button class="nav-btn" onclick="switchTab('solutions')">Solutions</button>
-                <button class="nav-btn" onclick="switchTab('support')">Support (Coming Soon)</button>
+                <button class="nav-btn" onclick="switchTab('support')">Support</button>
                 <button class="nav-btn" onclick="switchTab('contact')">Contact Us (Coming Soon)</button>
             </nav>
         </div>
@@ -276,8 +276,8 @@
             document.querySelectorAll('.solution-detail').forEach(detail => detail.style.display = 'none');
             document.getElementById('solutions-main').style.display = 'block';
         }
-        // API Payload Simulation for Support Ticket
-        function submitTicket(event) {
+        // Connect the Frontend to the Python API
+        async function submitTicket(event) {
             event.preventDefault(); // Stop page reload
             
             // Package the data into a JSON object
@@ -286,16 +286,29 @@
                 email: document.getElementById('reqEmail').value,
                 severity: document.getElementById('ticketSeverity').value,
                 category: document.getElementById('ticketCategory').value,
-                description: document.getElementById('ticketDesc').value,
-                timestamp: new Date().toISOString()
+                description: document.getElementById('ticketDesc').value
             };
 
-            // Simulate sending to the Python API
-            console.log("Transmitting payload to API:", ticketPayload);
-            
-            alert("Ticket successfully captured!\n\nIn our next sprint, this JSON payload will be sent to the Python API to be saved in PostgreSQL:\n\n" + JSON.stringify(ticketPayload, null, 2));
-            
-            document.getElementById('supportForm').reset();
+            try {
+                // Send the JSON payload to the Python API
+                const response = await fetch('http://ciscotechnologies.com:5000/api/ticket', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(ticketPayload)
+                });
+
+                if (response.ok) {
+                    alert("Success! Ticket has been routed through the Python API and saved to the PostgreSQL database.");
+                    document.getElementById('supportForm').reset();
+                } else {
+                    alert("Error: The database rejected the ticket.");
+                }
+            } catch (error) {
+                console.error("Network Error:", error);
+                alert("Critical Error: The Python API is currently unreachable.");
+            }
         }
     </script>
 </body>
