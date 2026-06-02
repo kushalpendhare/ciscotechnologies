@@ -8,7 +8,7 @@ app = Flask(__name__)
 CORS(app)
 
 DB_USER = os.getenv("POSTGRES_USER", "cisco_admin")
-DB_PASS = os.getenv("POSTGRES_PASSWORD", "SuperSecretPassword123!")
+DB_PASS = os.getenv("POSTGRES_PASSWORD", "Password123!")
 DB_NAME = os.getenv("POSTGRES_DB", "cisco_architecture")
 DB_HOST = os.getenv("DB_HOST", "db")
 
