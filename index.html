@@ -186,6 +186,11 @@
             
             <div class="contact-wrapper">
                 <form id="supportForm" onsubmit="submitTicket(event)">
+                    <div id="successMessage" style="display: none; background: #d4edda; color: #155724; padding: 30px; border-radius: 8px; border: 1px solid #c3e6cb; margin-bottom: 20px; text-align: center;">
+                        <h3 style="margin-bottom: 15px; font-size: 24px;">✅ Ticket Submitted Successfully</h3>
+                        <p id="successText" style="font-size: 18px; font-weight: bold;"></p>
+                        <button onclick="resetForm()" class="submit-btn" style="margin-top: 20px; width: auto; padding: 10px 20px;">Open Another Ticket</button>
+                    </div>
                     <div class="form-group">
                         <label for="reqName">Requester Name</label>
                         <input type="text" id="reqName" required placeholder="Jane Doe">
@@ -278,9 +283,8 @@
         }
         // Connect the Frontend to the Python API
         async function submitTicket(event) {
-            event.preventDefault(); // Stop page reload
+            event.preventDefault(); 
             
-            // Package the data into a JSON object
             const ticketPayload = {
                 requester: document.getElementById('reqName').value,
                 email: document.getElementById('reqEmail').value,
@@ -290,18 +294,18 @@
             };
 
             try {
-                // Send the JSON payload to the Python API
                 const response = await fetch(`http://${window.location.hostname}:5000/api/ticket`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(ticketPayload)
                 });
 
                 if (response.ok) {
-                    alert("Success! Ticket has been routed through the Python API and saved to the PostgreSQL database.");
-                    document.getElementById('supportForm').reset();
+                    const result = await response.json();
+                    // Hide the form and show the success message with the ID
+                    document.getElementById('supportForm').style.display = 'none';
+                    document.getElementById('successMessage').style.display = 'block';
+                    document.getElementById('successText').innerText = `Your request ID #${result.ticket_id} is created. Our support team will contact you soon.`;
                 } else {
                     alert("Error: The database rejected the ticket.");
                 }
@@ -309,6 +313,13 @@
                 console.error("Network Error:", error);
                 alert("Critical Error: The Python API is currently unreachable.");
             }
+        }
+
+        // Reset the form to submit another ticket
+        function resetForm() {
+            document.getElementById('supportForm').reset();
+            document.getElementById('supportForm').style.display = 'block';
+            document.getElementById('successMessage').style.display = 'none';
         }
     </script>
 </body>
