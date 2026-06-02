@@ -2,41 +2,53 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TAC Admin Dashboard</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; color: #333; margin: 0; padding: 20px; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; }
         .header { background: #1a1a1a; color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;}
         .refresh-btn { background: #049fd9; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; }
-        .refresh-btn:hover { background: #007bb5; }
+        .logout-btn { background: #d9534f; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; margin-left: 10px; }
         table { width: 100%; border-collapse: collapse; background: white; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-radius: 8px; overflow: hidden; }
         th { background: #049fd9; color: white; padding: 15px; text-align: left; }
         td { padding: 15px; border-bottom: 1px solid #ddd; }
         tr:hover { background-color: #f1f8fc; }
-        .critical { color: red; font-weight: bold; }
+        .action-btn { border: none; padding: 6px 12px; margin-right: 5px; border-radius: 4px; color: white; font-weight: bold; cursor: pointer; font-size: 12px; }
+        .resolve-btn { background: #5cb85c; }
+        .close-btn { background: #f0ad4e; }
+        .status-badge { padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; text-transform: uppercase; }
+        .status-open { background: #d9534f; color: white; }
+        .status-resolved { background: #5cb85c; color: white; }
+        .status-closed { background: #777; color: white; }
     </style>
 </head>
-<body onload="loadTickets()">
+<body>
+    <script>
+        if (localStorage.getItem('tac_authenticated') !== 'true') {
+            window.location.href = 'login.html';
+        }
+    </script>
 
     <div class="header">
         <h2>🛠️ Internal TAC Portal (Global Queue)</h2>
-        <button class="refresh-btn" onclick="loadTickets()">↻ Refresh Data</button>
+        <div>
+            <button class="refresh-btn" onclick="loadTickets()">↻ Refresh Data</button>
+            <button class="logout-btn" onclick="localStorage.clear(); window.location.reload();">Log Out</button>
+        </div>
     </div>
 
     <table>
         <thead>
             <tr>
                 <th>Ticket ID</th>
+                <th>Status</th>
                 <th>Severity</th>
-                <th>Requester</th>
+                <th>Requester Info</th>
                 <th>Category</th>
                 <th>Description</th>
-                <th>Timestamp</th>
+                <th>Actions</th>
             </tr>
         </thead>
-        <tbody id="ticketTableBody">
-            <tr><td colspan="6" style="text-align: center;">Loading tickets from database...</td></tr>
-        </tbody>
+        <tbody id="ticketTableBody"></tbody>
     </table>
 
     <script>
@@ -44,29 +56,45 @@
             try {
                 const response = await fetch(`http://${window.location.hostname}:5000/api/tickets`);
                 const tickets = await response.json();
-                
                 const tableBody = document.getElementById('ticketTableBody');
                 tableBody.innerHTML = ''; 
                 
                 tickets.forEach(ticket => {
-                    const isCritical = ticket.severity.includes('P1') || ticket.severity.includes('P2');
-                    const severityClass = isCritical ? 'critical' : '';
-                    
                     const row = `<tr>
                         <td><strong>#${ticket.id}</strong></td>
-                        <td class="${severityClass}">${ticket.severity}</td>
-                        <td>${ticket.requester}<br><small>${ticket.email}</small></td>
+                        <td><span class="status-badge status-${ticket.status.toLowerCase()}">${ticket.status}</span></td>
+                        <td>${ticket.severity}</td>
+                        <td>${ticket.requester}<br><small>${ticket.phone}</small></td>
                         <td>${ticket.category}</td>
                         <td>${ticket.description}</td>
-                        <td>${new Date(ticket.timestamp).toLocaleString()}</td>
+                        <td>
+                            ${ticket.status === 'Open' ? `<button class="action-btn resolve-btn" onclick="updateStatus(${ticket.id}, 'Resolved')">Resolve</button>` : ''}
+                            ${ticket.status !== 'Closed' ? `<button class="action-btn close-btn" onclick="updateStatus(${ticket.id}, 'Closed')">Close</button>` : '—'}
+                        </td>
                     </tr>`;
                     tableBody.innerHTML += row;
                 });
             } catch (error) {
-                console.error("Error loading tickets:", error);
-                document.getElementById('ticketTableBody').innerHTML = `<tr><td colspan="6" style="color: red; text-align: center;">Connection to API failed.</td></tr>`;
+                console.error("Dashboard connection failed.");
             }
         }
+
+        async function updateStatus(ticketId, newStatus) {
+            try {
+                const response = await fetch(`http://${window.location.hostname}:5000/api/ticket/update`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: ticketId, status: newStatus })
+                });
+                if (response.ok) {
+                    loadTickets(); // Smooth UI reload to show updated state
+                }
+            } catch (e) {
+                alert("Failed to write state update to database.");
+            }
+        }
+        
+        loadTickets();
     </script>
 </body>
 </html>

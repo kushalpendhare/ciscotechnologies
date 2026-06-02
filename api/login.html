@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TAC Gateway Login</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #1a1a1a; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .login-box { background: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 25px rgba(0,0,0,0.3); width: 100%; max-width: 400px; }
+        h2 { color: #049fd9; margin-bottom: 20px; text-align: center; }
+        .form-input { width: 100%; padding: 12px; margin-bottom: 20px; border: 2px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
+        .login-btn { width: 100%; padding: 12px; background: #049fd9; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; }
+        .login-btn:hover { background: #007bb5; }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <h2>🛠️ TAC Portal Access</h2>
+        <form onsubmit="handleLogin(event)">
+            <input type="text" id="username" class="form-input" placeholder="Username (admin)" required>
+            <input type="password" id="password" class="form-input" placeholder="Password" required>
+            <button type="submit" class="login-btn">Authenticate</button>
+        </form>
+    </div>
+
+    <script>
+        async function handleLogin(event) {
+            event.preventDefault();
+            const payload = {
+                username: document.getElementById('username').value,
+                password: document.getElementById('password').value
+            };
+            try {
+                const response = await fetch(`http://${window.location.hostname}:5000/api/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+                if (response.ok) {
+                    // Lock an ephemeral token inside browser memory
+                    localStorage.setItem('tac_authenticated', 'true');
+                    window.location.href = 'admin.html';
+                } else {
+                    alert(result.message);
+                }
+            } catch (e) {
+                alert("Authentication firewall error.");
+            }
+        }
+    </script>
+</body>
+</html>

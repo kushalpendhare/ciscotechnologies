@@ -8,7 +8,7 @@ app = Flask(__name__)
 CORS(app)
 
 DB_USER = os.getenv("POSTGRES_USER", "cisco_admin")
-DB_PASS = os.getenv("POSTGRES_PASSWORD", "Password123!")
+DB_PASS = os.getenv("POSTGRES_PASSWORD", "SuperSecretPassword123!")
 DB_NAME = os.getenv("POSTGRES_DB", "cisco_architecture")
 DB_HOST = os.getenv("DB_HOST", "db")
 
@@ -18,7 +18,6 @@ def get_db_connection():
 def init_db():
     conn = get_db_connection()
     cur = conn.cursor()
-    # Updated Schema: ID is now an Integer, added Phone, added Status
     cur.execute('''
         CREATE TABLE IF NOT EXISTS tickets (
             id INTEGER PRIMARY KEY,
@@ -36,13 +35,12 @@ def init_db():
     cur.close()
     conn.close()
 
+# 1. CREATE: Ticket Submission Route
 @app.route('/api/ticket', methods=['POST'])
 def create_ticket():
     data = request.json
     conn = get_db_connection()
     cur = conn.cursor()
-    
-    # Generate a random 5-digit ticket number (e.g., 48291)
     new_ticket_id = random.randint(10000, 99999)
     
     cur.execute(
@@ -52,9 +50,9 @@ def create_ticket():
     conn.commit()
     cur.close()
     conn.close()
-    
     return jsonify({"status": "success", "ticket_id": new_ticket_id}), 201
 
+# 2. READ: Fetch Queue Route
 @app.route('/api/tickets', methods=['GET'])
 def get_tickets():
     conn = get_db_connection()
@@ -70,8 +68,31 @@ def get_tickets():
             "id": t[0], "requester": t[1], "email": t[2], "phone": t[3],
             "severity": t[4], "category": t[5], "description": t[6], "status": t[7], "timestamp": t[8]
         })
-        
     return jsonify(ticket_list), 200
+
+# 3. UPDATE: Change Ticket Status Route (The 'U' in CRUD)
+@app.route('/api/ticket/update', methods=['PUT'])
+def update_ticket():
+    data = request.json
+    ticket_id = data.get('id')
+    new_status = data.get('status')
+    
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute('UPDATE tickets SET status = %s WHERE id = %s', (new_status, ticket_id))
+    conn.commit()
+    cur.close()
+    conn.close()
+    return jsonify({"status": "success", "message": "Ticket status updated in database"}), 200
+
+# 4. AUTH: Simple Admin Login Challenge
+@app.route('/api/login', methods=['POST'])
+def admin_login():
+    data = request.json
+    # Prototype baseline credentials
+    if data.get('username') == 'admin' and data.get('password') == 'CiscoAdmin123!':
+        return jsonify({"status": "authenticated", "token": "secure-tac-session-token-xyz"}), 200
+    return jsonify({"status": "unauthorized", "message": "Invalid TAC Credentials"}), 401
 
 if __name__ == '__main__':
     init_db()
