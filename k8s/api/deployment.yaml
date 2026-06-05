@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: cisco-api
-          image: YOUR_REGISTRY/cisco-api:latest
+          image: ghcr.io/kushalpendhare/cisco-api:latest
           ports:
             - containerPort: 5000
           env:

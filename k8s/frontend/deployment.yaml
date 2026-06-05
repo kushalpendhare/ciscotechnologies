@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: cisco-frontend
-          image: YOUR_REGISTRY/cisco-frontend:latest
+          image: ghcr.io/kushalpendhare/cisco-frontend:latest
           ports:
             - containerPort: 80
           readinessProbe:

@@ -22,4 +22,4 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: cisco-secrets
-                  key: TUNNEL_TOKEN
+                  key: eyJhIjoiOWZkODA2YzExMDhiZGY1Mzc4Zjg4OGM1MWVlZGM1MmIiLCJ0IjoiOGJlOWI1NzQtODU1OS00YWUwLWJmMGUtYjQyMmE4NDE2NzRlIiwicyI6Ik1UazNZemcwTXpRdE5HRTRZeTAwTldJekxUaG1OamN0Wm1RNFpqSmpNall5WXpCbCJ9
