@@ -95,8 +95,8 @@ pipeline {
                 echo '✅ Verifying pods are running...'
                 sh '''
                     ssh -o StrictHostKeyChecking=no sysadmin@192.168.0.231 \
-                        "ansible -i 192.168.0.232, all -m shell \
-                        -a "kubectl get pods -n ciscotechnologies"
+                        "ansible -i ansible/inventory.ini all \
+                        -m shell -a 'kubectl get pods -n ciscotechnologies'"
                 '''
             }
         }
