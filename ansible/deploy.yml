@@ -1,60 +1,43 @@
----
 - name: Deploy CiscoTechnologies to Kubernetes
-  hosts: all
+  hosts: k8s_master
   become: false
 
   tasks:
-
-    - name: Create namespace
+    - name: Pull latest code on K8s master
       shell: |
-        kubectl apply -f /opt/ciscotechnologies/k8s/namespace/namespace.yaml
-      ignore_errors: yes
+        cd /opt/ciscotechnologies/ciscotechnologies &&
+        git pull origin main
 
-    - name: Apply ConfigMaps
+    - name: Apply all K8s manifests
       shell: |
-        kubectl apply -f /opt/ciscotechnologies/k8s/config/configmap.yaml
-        kubectl apply -f /opt/ciscotechnologies/k8s/postgres/init-configmap.yaml
-        kubectl apply -f /opt/ciscotechnologies/k8s/nginx/configmap.yaml
+        cd /opt/ciscotechnologies/ciscotechnologies &&
+        kubectl apply -f k8s/namespace/namespace.yaml &&
+        kubectl apply -f k8s/config/configmap.yaml &&
+        kubectl apply -f k8s/config/secret.yaml &&
+        kubectl apply -f k8s/postgres/init-configmap.yaml &&
+        kubectl apply -f k8s/postgres/pvc.yaml &&
+        kubectl apply -f k8s/postgres/deployment.yaml &&
+        kubectl apply -f k8s/postgres/service.yaml &&
+        kubectl apply -f k8s/api/deployment.yaml &&
+        kubectl apply -f k8s/api/service.yaml &&
+        kubectl apply -f k8s/frontend/deployment.yaml &&
+        kubectl apply -f k8s/frontend/service.yaml &&
+        kubectl apply -f k8s/nginx/configmap.yaml &&
+        kubectl apply -f k8s/nginx/deployment.yaml &&
+        kubectl apply -f k8s/nginx/service.yaml &&
+        kubectl apply -f k8s/tunnel/deployment.yaml
 
-    - name: Apply Secrets
+    - name: Wait for rollout
       shell: |
-        kubectl apply -f /opt/ciscotechnologies/k8s/config/secret.yaml
-
-    - name: Deploy PostgreSQL
-      shell: |
-        kubectl apply -f /opt/ciscotechnologies/k8s/postgres/pvc.yaml
-        kubectl apply -f /opt/ciscotechnologies/k8s/postgres/deployment.yaml
-        kubectl apply -f /opt/ciscotechnologies/k8s/postgres/service.yaml
-
-    - name: Wait for PostgreSQL to be ready
-      shell: |
-        kubectl rollout status deployment/cisco-postgres \
+        kubectl rollout status deployment/cisco-api \
+          -n ciscotechnologies --timeout=120s
+        kubectl rollout status deployment/cisco-frontend \
           -n ciscotechnologies --timeout=120s
 
-    - name: Deploy API
-      shell: |
-        kubectl apply -f /opt/ciscotechnologies/k8s/api/deployment.yaml
-        kubectl apply -f /opt/ciscotechnologies/k8s/api/service.yaml
+    - name: Get pod status
+      shell: kubectl get pods -n ciscotechnologies
+      register: pods
 
-    - name: Deploy Frontend
-      shell: |
-        kubectl apply -f /opt/ciscotechnologies/k8s/frontend/deployment.yaml
-        kubectl apply -f /opt/ciscotechnologies/k8s/frontend/service.yaml
-
-    - name: Deploy Nginx
-      shell: |
-        kubectl apply -f /opt/ciscotechnologies/k8s/nginx/deployment.yaml
-        kubectl apply -f /opt/ciscotechnologies/k8s/nginx/service.yaml
-
-    - name: Deploy Cloudflare Tunnel
-      shell: |
-        kubectl apply -f /opt/ciscotechnologies/k8s/tunnel/deployment.yaml
-
-    - name: Verify all pods running
-      shell: |
-        kubectl get pods -n ciscotechnologies
-      register: pod_status
-
-    - name: Print pod status
+    - name: Print pods
       debug:
-        var: pod_status.stdout_lines
+        var: pods.stdout_lines

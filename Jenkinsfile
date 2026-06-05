@@ -80,9 +80,12 @@ pipeline {
             steps {
                 echo '🚀 Triggering Ansible deployment to K8s...'
                 sh '''
-                    ansible-playbook -i $ANSIBLE_HOST, \
-                        ansible/deploy.yml \
-                        --extra-vars "build_number=${BUILD_NUMBER}"
+                    ssh -o StrictHostKeyChecking=no sysadmin@192.168.0.231 "
+                        cd /opt/ciscotechnologies &&
+                        git pull origin main &&
+                        ansible-playbook ansible/deploy.yml \
+                            --extra-vars 'build_number=${BUILD_NUMBER}'
+                    "
                 '''
             }
         }
@@ -91,8 +94,8 @@ pipeline {
             steps {
                 echo '✅ Verifying pods are running...'
                 sh '''
-                    ansible -i $ANSIBLE_HOST, all \
-                        -m shell \
+                    ssh -o StrictHostKeyChecking=no sysadmin@192.168.0.231 \
+                        "ansible -i 192.168.0.232, all -m shell \
                         -a "kubectl get pods -n ciscotechnologies"
                 '''
             }
