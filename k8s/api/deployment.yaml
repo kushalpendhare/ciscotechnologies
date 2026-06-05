@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cisco-api
+  namespace: ciscotechnologies
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cisco-api
+  template:
+    metadata:
+      labels:
+        app: cisco-api
+    spec:
+      containers:
+        - name: cisco-api
+          image: YOUR_REGISTRY/cisco-api:latest
+          ports:
+            - containerPort: 5000
+          env:
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: cisco-config
+                  key: DB_HOST
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: cisco-config
+                  key: DB_NAME
+            - name: POSTGRES_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: cisco-config
+                  key: DB_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: cisco-secrets
+                  key: POSTGRES_PASSWORD
+            - name: FLASK_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: cisco-secrets
+                  key: FLASK_SECRET_KEY
+            - name: ADMIN_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: cisco-secrets
+                  key: ADMIN_USERNAME
+            - name: ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: cisco-secrets
+                  key: ADMIN_PASSWORD
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 5000
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 5000
+            initialDelaySeconds: 30
+            periodSeconds: 15

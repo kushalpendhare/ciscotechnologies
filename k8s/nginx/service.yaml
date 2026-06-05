@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: cisco-nginx-service
+  namespace: ciscotechnologies
+spec:
+  selector:
+    app: cisco-nginx
+  ports:
+    - port: 80
+      targetPort: 80
+  type: NodePort

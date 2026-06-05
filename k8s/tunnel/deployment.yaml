@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cisco-tunnel
+  namespace: ciscotechnologies
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cisco-tunnel
+  template:
+    metadata:
+      labels:
+        app: cisco-tunnel
+    spec:
+      containers:
+        - name: cloudflared
+          image: cloudflare/cloudflared:latest
+          command: ["cloudflared", "tunnel", "--no-autoupdate", "run"]
+          env:
+            - name: TUNNEL_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: cisco-secrets
+                  key: TUNNEL_TOKEN

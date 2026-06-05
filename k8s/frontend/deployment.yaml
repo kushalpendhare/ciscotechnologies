@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cisco-frontend
+  namespace: ciscotechnologies
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cisco-frontend
+  template:
+    metadata:
+      labels:
+        app: cisco-frontend
+    spec:
+      containers:
+        - name: cisco-frontend
+          image: YOUR_REGISTRY/cisco-frontend:latest
+          ports:
+            - containerPort: 80
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 20
+            periodSeconds: 10
