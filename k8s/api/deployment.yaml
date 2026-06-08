@@ -12,6 +12,8 @@ spec:
     metadata:
       labels:
         app: cisco-api
+      imagePullSecrets:
+        - name: ghcr-secret  
     spec:
       containers:
         - name: cisco-api

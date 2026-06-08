@@ -12,6 +12,8 @@ spec:
     metadata:
       labels:
         app: cisco-frontend
+      imagePullSecrets:
+        - name: ghcr-secret  
     spec:
       containers:
         - name: cisco-frontend

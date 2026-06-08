@@ -4,47 +4,58 @@
   become: false
 
   tasks:
-    - name: Pull latest code on K8s master
-      shell: |
-        cd /opt/ciscotechnologies/ciscotechnologies &&
-        git pull origin main
-
     - name: Apply namespace
-      shell: kubectl apply -f /opt/ciscotechnologies/ciscotechnologies/k8s/namespace/namespace.yaml
+      shell: kubectl apply -f /tmp/cisco-k8s/k8s/namespace/namespace.yaml
 
-    - name: Apply configs
+    - name: Apply ConfigMaps
       shell: |
-        kubectl apply -f /opt/ciscotechnologies/ciscotechnologies/k8s/config/configmap.yaml
-        kubectl apply -f /opt/ciscotechnologies/ciscotechnologies/k8s/config/secret.yaml
-        kubectl apply -f /opt/ciscotechnologies/ciscotechnologies/k8s/postgres/init-configmap.yaml
-        kubectl apply -f /opt/ciscotechnologies/ciscotechnologies/k8s/nginx/configmap.yaml
+        kubectl apply -f /tmp/cisco-k8s/k8s/config/configmap.yaml
+        kubectl apply -f /tmp/cisco-k8s/k8s/postgres/init-configmap.yaml
+        kubectl apply -f /tmp/cisco-k8s/k8s/nginx/configmap.yaml
 
     - name: Deploy PostgreSQL
       shell: |
-        kubectl apply -f /opt/ciscotechnologies/ciscotechnologies/k8s/postgres/pvc.yaml
-        kubectl apply -f /opt/ciscotechnologies/ciscotechnologies/k8s/postgres/deployment.yaml
-        kubectl apply -f /opt/ciscotechnologies/ciscotechnologies/k8s/postgres/service.yaml
+        kubectl apply -f /tmp/cisco-k8s/k8s/postgres/pvc.yaml
+        kubectl apply -f /tmp/cisco-k8s/k8s/postgres/deployment.yaml
+        kubectl apply -f /tmp/cisco-k8s/k8s/postgres/service.yaml
 
     - name: Wait for PostgreSQL
-      shell: kubectl rollout status deployment/cisco-postgres -n ciscotechnologies --timeout=120s
+      shell: |
+        kubectl rollout status deployment/cisco-postgres \
+          -n ciscotechnologies --timeout=120s
 
     - name: Deploy API
       shell: |
-        kubectl apply -f /opt/ciscotechnologies/ciscotechnologies/k8s/api/deployment.yaml
-        kubectl apply -f /opt/ciscotechnologies/ciscotechnologies/k8s/api/service.yaml
+        kubectl apply -f /tmp/cisco-k8s/k8s/api/deployment.yaml
+        kubectl apply -f /tmp/cisco-k8s/k8s/api/service.yaml
 
     - name: Deploy Frontend
       shell: |
-        kubectl apply -f /opt/ciscotechnologies/ciscotechnologies/k8s/frontend/deployment.yaml
-        kubectl apply -f /opt/ciscotechnologies/ciscotechnologies/k8s/frontend/service.yaml
+        kubectl apply -f /tmp/cisco-k8s/k8s/frontend/deployment.yaml
+        kubectl apply -f /tmp/cisco-k8s/k8s/frontend/service.yaml
 
     - name: Deploy Nginx
       shell: |
-        kubectl apply -f /opt/ciscotechnologies/ciscotechnologies/k8s/nginx/deployment.yaml
-        kubectl apply -f /opt/ciscotechnologies/ciscotechnologies/k8s/nginx/service.yaml
+        kubectl apply -f /tmp/cisco-k8s/k8s/nginx/deployment.yaml
+        kubectl apply -f /tmp/cisco-k8s/k8s/nginx/service.yaml
 
     - name: Deploy Tunnel
-      shell: kubectl apply -f /opt/ciscotechnologies/ciscotechnologies/k8s/tunnel/deployment.yaml
+      shell: |
+        kubectl apply -f /tmp/cisco-k8s/k8s/tunnel/deployment.yaml
+
+    - name: Rollout restart to pick up new images
+      shell: |
+        kubectl rollout restart deployment/cisco-api -n ciscotechnologies
+        kubectl rollout restart deployment/cisco-frontend -n ciscotechnologies
+        kubectl rollout restart deployment/cisco-nginx -n ciscotechnologies
+        kubectl rollout restart deployment/cisco-tunnel -n ciscotechnologies
+
+    - name: Wait for rollout
+      shell: |
+        kubectl rollout status deployment/cisco-api \
+          -n ciscotechnologies --timeout=120s
+        kubectl rollout status deployment/cisco-frontend \
+          -n ciscotechnologies --timeout=120s
 
     - name: Get pod status
       shell: kubectl get pods -n ciscotechnologies
