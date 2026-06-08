@@ -133,6 +133,18 @@ pipeline {
                 """
             }
         }
+        
+        stage('SCP Manifests to K8s Master') {
+            steps {
+                echo '📦 Copying K8s manifests to K8s master...'
+                sh """
+                    ssh -o StrictHostKeyChecking=no sysadmin@${K8S_MASTER} \
+                        'mkdir -p /tmp/cisco-k8s'
+                    scp -o StrictHostKeyChecking=no -r k8s/ \
+                        sysadmin@${K8S_MASTER}:/tmp/cisco-k8s/
+                """
+            }
+        }
 
         stage('Deploy via Ansible') {
             steps {
