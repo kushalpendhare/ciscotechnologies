@@ -18,6 +18,7 @@ spec:
       containers:
         - name: cisco-api
           image: ghcr.io/kushalpendhare/cisco-api:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 5000
           env:
