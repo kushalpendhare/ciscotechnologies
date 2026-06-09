@@ -11,10 +11,10 @@ spec:
   template:
     metadata:
       labels:
-        app: cisco-api
+        app: cisco-api  
+    spec:
       imagePullSecrets:
         - name: ghcr-secret  
-    spec:
       containers:
         - name: cisco-api
           image: ghcr.io/kushalpendhare/cisco-api:BUILD_NUMBER

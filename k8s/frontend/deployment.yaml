@@ -12,9 +12,9 @@ spec:
     metadata:
       labels:
         app: cisco-frontend
+    spec: 
       imagePullSecrets:
         - name: ghcr-secret  
-    spec:
       containers:
         - name: cisco-frontend
           image: ghcr.io/kushalpendhare/cisco-frontend:BUILD_NUMBER
