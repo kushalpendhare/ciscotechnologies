@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: cisco-frontend
-          image: ghcr.io/kushalpendhare/cisco-frontend:latest
+          image: ghcr.io/kushalpendhare/cisco-frontend:BUILD_NUMBER
           imagePullPolicy: Always
           ports:
             - containerPort: 80

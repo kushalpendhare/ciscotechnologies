@@ -14,6 +14,14 @@ pipeline {
 
     stages {
 
+        stage('Reset Workspace') {
+            steps {
+                sh '''
+                    git reset --hard HEAD
+                    git clean -fd
+                '''
+            }
+        }
         stage('Checkout') {
             steps {
                 echo '📥 Pulling latest code...'
@@ -136,6 +144,12 @@ pipeline {
         
         stage('SCP Manifests to K8s Master') {
             steps {
+                echo '📝 Updating image tags in manifests...'
+                sh """
+                    sed -i 's|ghcr.io/kushalpendhare/cisco-frontend:BUILD_NUMBER|ghcr.io/kushalpendhare/cisco-frontend:${BUILD_NUMBER}|g' k8s/frontend/deployment.yaml
+                    sed -i 's|ghcr.io/kushalpendhare/cisco-api:BUILD_NUMBER|ghcr.io/kushalpendhare/cisco-api:${BUILD_NUMBER}|g' k8s/api/deployment.yaml
+                """
+
                 echo '📦 Copying K8s manifests to K8s master...'
                 sh """
                     ssh -o StrictHostKeyChecking=no sysadmin@${K8S_MASTER} \
