@@ -7,21 +7,14 @@ pipeline {
         REGISTRY       = "ghcr.io/kushalpendhare"
         IMAGE_API      = "${REGISTRY}/cisco-api"
         IMAGE_FRONTEND = "${REGISTRY}/cisco-frontend"
-        K8S_NAMESPACE  = "ciscotechnologies"
+        UAT_NAMESPACE  = "ciscotechnologies-uat"
+        PROD_NAMESPACE = "ciscotechnologies"
         ANSIBLE_HOST   = "192.168.0.231"
         K8S_MASTER     = "192.168.0.232"
     }
 
     stages {
 
-        stage('Reset Workspace') {
-            steps {
-                sh '''
-                    git reset --hard HEAD
-                    git clean -fd
-                '''
-            }
-        }
         stage('Checkout') {
             steps {
                 echo '📥 Pulling latest code...'
@@ -36,99 +29,103 @@ pipeline {
             }
         }
 
-        stage('Build API Image') {
-            steps {
-                echo '🔨 Building Flask API image...'
-                sh """
-                    docker build -t ${IMAGE_API}:latest \
-                                 -t ${IMAGE_API}:${BUILD_NUMBER} \
-                                 ./api
-                """
+        stage('Build Images') {
+            parallel {
+                stage('Build API') {
+                    steps {
+                        echo '🔨 Building Flask API...'
+                        sh """
+                            docker build -t ${IMAGE_API}:${BUILD_NUMBER} \
+                                         -t ${IMAGE_API}:uat-latest \
+                                         ./api
+                        """
+                    }
+                }
+                stage('Build Frontend') {
+                    steps {
+                        echo '🔨 Building React Frontend...'
+                        sh """
+                            docker build -t ${IMAGE_FRONTEND}:${BUILD_NUMBER} \
+                                         -t ${IMAGE_FRONTEND}:uat-latest \
+                                         ./frontend
+                        """
+                    }
+                }
             }
         }
 
-        stage('Build Frontend Image') {
-            steps {
-                echo '🔨 Building React frontend image...'
-                sh """
-                    docker build -t ${IMAGE_FRONTEND}:latest \
-                                 -t ${IMAGE_FRONTEND}:${BUILD_NUMBER} \
-                                 ./frontend
-                """
+        stage('Security Scan') {
+            parallel {
+                stage('Scan API Image') {
+                    steps {
+                        echo '🔍 Scanning API image for CVEs...'
+                        sh """
+                            docker run --rm \
+                                -v /var/run/docker.sock:/var/run/docker.sock \
+                                aquasec/trivy image \
+                                --exit-code 0 \
+                                --severity HIGH,CRITICAL \
+                                --no-progress \
+                                ${IMAGE_API}:${BUILD_NUMBER} || true
+                        """
+                    }
+                }
+                stage('Scan Frontend Image') {
+                    steps {
+                        echo '🔍 Scanning Frontend image for CVEs...'
+                        sh """
+                            docker run --rm \
+                                -v /var/run/docker.sock:/var/run/docker.sock \
+                                aquasec/trivy image \
+                                --exit-code 0 \
+                                --severity HIGH,CRITICAL \
+                                --no-progress \
+                                ${IMAGE_FRONTEND}:${BUILD_NUMBER} || true
+                        """
+                    }
+                }
+                stage('Python SAST') {
+                    steps {
+                        echo '🔍 Running Bandit Python SAST...'
+                        sh '''
+                            pip install bandit -q 2>/dev/null || true
+                            bandit -r api/ -ll -ii -f txt || true
+                        '''
+                    }
+                }
+                stage('Dependency Check') {
+                    steps {
+                        echo '🔍 Checking vulnerable dependencies...'
+                        sh '''
+                            pip install safety -q 2>/dev/null || true
+                            safety check -r api/requirements.txt || true
+                        '''
+                    }
+                }
             }
         }
 
-        stage('Push Images to GHCR') {
+        stage('Push Images') {
             steps {
                 echo '📤 Pushing images to GHCR...'
                 sh """
-                    docker push ${IMAGE_API}:latest
                     docker push ${IMAGE_API}:${BUILD_NUMBER}
-                    docker push ${IMAGE_FRONTEND}:latest
+                    docker push ${IMAGE_API}:uat-latest
                     docker push ${IMAGE_FRONTEND}:${BUILD_NUMBER}
-                """
-            }
-        }
-
-        stage('Update Image Tags') {
-            steps {
-                echo '📝 Updating image tags in manifests...'
-                sh """
-                    sed -i "s|YOUR_REGISTRY/cisco-api:latest|${IMAGE_API}:${BUILD_NUMBER}|g" \
-                        k8s/api/deployment.yaml
-                    sed -i "s|YOUR_REGISTRY/cisco-frontend:latest|${IMAGE_FRONTEND}:${BUILD_NUMBER}|g" \
-                        k8s/frontend/deployment.yaml
-                """
-            }
-        }
-
-        stage('Create K8s Secrets') {
-            environment {
-                POSTGRES_PASSWORD = credentials('postgres-password')
-                FLASK_SECRET_KEY  = credentials('flask-secret-key')
-                ADMIN_USERNAME    = credentials('admin-username')
-                ADMIN_PASSWORD    = credentials('admin-password')
-                TUNNEL_TOKEN      = credentials('tunnel-token')
-            }
-            steps {
-                echo '🔑 Creating K8s secrets from Jenkins credentials...'
-                sh """
-                    ssh -o StrictHostKeyChecking=no sysadmin@${K8S_MASTER} '
-                        kubectl create namespace ${K8S_NAMESPACE} \
-                            --dry-run=client -o yaml | kubectl apply -f -
-
-                        kubectl create secret generic cisco-secrets \
-                            --namespace=${K8S_NAMESPACE} \
-                            --from-literal=POSTGRES_PASSWORD="${POSTGRES_PASSWORD}" \
-                            --from-literal=FLASK_SECRET_KEY="${FLASK_SECRET_KEY}" \
-                            --from-literal=ADMIN_USERNAME="${ADMIN_USERNAME}" \
-                            --from-literal=ADMIN_PASSWORD="${ADMIN_PASSWORD}" \
-                            --from-literal=TUNNEL_TOKEN="${TUNNEL_TOKEN}" \
-                            --dry-run=client -o yaml | kubectl apply -f -
-                    '
-                """
-            }
-        }
-
-        stage('Create imagePullSecret') {
-            steps {
-                echo '🔐 Creating GHCR pull secret in K8s...'
-                sh """
-                    ssh -o StrictHostKeyChecking=no sysadmin@${K8S_MASTER} '
-                        kubectl create secret docker-registry ghcr-secret \
-                            --namespace=${K8S_NAMESPACE} \
-                            --docker-server=ghcr.io \
-                            --docker-username=${GHCR_USERNAME} \
-                            --docker-password=${GHCR_TOKEN} \
-                            --dry-run=client -o yaml | kubectl apply -f -
-                    '
+                    docker push ${IMAGE_FRONTEND}:uat-latest
                 """
             }
         }
 
         stage('SCP Manifests to Ansible') {
             steps {
-                echo '📦 Copying K8s manifests to Ansible server...'
+                echo '📝 Updating image tags in manifests...'
+                sh """
+                    sed -i 's|ghcr.io/kushalpendhare/cisco-frontend:BUILD_NUMBER|ghcr.io/kushalpendhare/cisco-frontend:${BUILD_NUMBER}|g' k8s/frontend/deployment.yaml
+                    sed -i 's|ghcr.io/kushalpendhare/cisco-api:BUILD_NUMBER|ghcr.io/kushalpendhare/cisco-api:${BUILD_NUMBER}|g' k8s/api/deployment.yaml
+                """
+
+                echo '📦 Copying manifests to Ansible server...'
                 sh """
                     ssh -o StrictHostKeyChecking=no sysadmin@${ANSIBLE_HOST} \
                         'mkdir -p /tmp/cisco-k8s'
@@ -141,7 +138,7 @@ pipeline {
                 """
             }
         }
-        
+
         stage('SCP Manifests to K8s Master') {
             steps {
                 echo '📝 Updating image tags in manifests...'
@@ -149,8 +146,7 @@ pipeline {
                     sed -i 's|ghcr.io/kushalpendhare/cisco-frontend:BUILD_NUMBER|ghcr.io/kushalpendhare/cisco-frontend:${BUILD_NUMBER}|g' k8s/frontend/deployment.yaml
                     sed -i 's|ghcr.io/kushalpendhare/cisco-api:BUILD_NUMBER|ghcr.io/kushalpendhare/cisco-api:${BUILD_NUMBER}|g' k8s/api/deployment.yaml
                 """
-
-                echo '📦 Copying K8s manifests to K8s master...'
+                echo '📦 Copying manifests to K8s master...'
                 sh """
                     ssh -o StrictHostKeyChecking=no sysadmin@${K8S_MASTER} \
                         'mkdir -p /tmp/cisco-k8s'
@@ -160,25 +156,132 @@ pipeline {
             }
         }
 
-        stage('Deploy via Ansible') {
+        stage('Create UAT Secrets') {
+            environment {
+                POSTGRES_PASSWORD = credentials('postgres-password')
+                FLASK_SECRET_KEY  = credentials('flask-secret-key')
+                ADMIN_USERNAME    = credentials('admin-username')
+                ADMIN_PASSWORD    = credentials('admin-password')
+                TUNNEL_TOKEN      = credentials('tunnel-token')
+            }
             steps {
-                echo '🚀 Deploying to K8s via Ansible...'
+                echo '🔑 Creating UAT secrets...'
                 sh """
-                    ssh -o StrictHostKeyChecking=no sysadmin@${ANSIBLE_HOST} \
-                    "ansible-playbook /tmp/cisco-k8s/deploy.yml \
-                        -i /tmp/cisco-k8s/inventory.ini \
-                        --extra-vars 'build_number=${BUILD_NUMBER}'"
+                    ssh -o StrictHostKeyChecking=no sysadmin@${K8S_MASTER} '
+                        kubectl create namespace ${UAT_NAMESPACE} \
+                            --dry-run=client -o yaml | kubectl apply -f -
+
+                        kubectl create secret generic cisco-secrets \
+                            --namespace=${UAT_NAMESPACE} \
+                            --from-literal=POSTGRES_PASSWORD="${POSTGRES_PASSWORD}" \
+                            --from-literal=FLASK_SECRET_KEY="${FLASK_SECRET_KEY}" \
+                            --from-literal=ADMIN_USERNAME="${ADMIN_USERNAME}" \
+                            --from-literal=ADMIN_PASSWORD="${ADMIN_PASSWORD}" \
+                            --from-literal=TUNNEL_TOKEN="${TUNNEL_TOKEN}" \
+                            --dry-run=client -o yaml | kubectl apply -f -
+
+                        kubectl create secret docker-registry ghcr-secret \
+                            --namespace=${UAT_NAMESPACE} \
+                            --docker-server=ghcr.io \
+                            --docker-username=${GHCR_USERNAME} \
+                            --docker-password=${GHCR_TOKEN} \
+                            --dry-run=client -o yaml | kubectl apply -f -
+                    '
                 """
             }
         }
 
-        stage('Verify Deployment') {
+        stage('Deploy to UAT') {
             steps {
-                echo '✅ Verifying pods...'
+                echo '🚀 Deploying to UAT...'
                 sh """
                     ssh -o StrictHostKeyChecking=no sysadmin@${ANSIBLE_HOST} \
-                    "ansible -i /tmp/cisco-k8s/inventory.ini all \
-                        -m shell -a 'kubectl get pods -n ${K8S_NAMESPACE}'"
+                    "ansible-playbook /tmp/cisco-k8s/deploy.yml \
+                        -i /tmp/cisco-k8s/inventory.ini \
+                        --extra-vars 'target_namespace=${UAT_NAMESPACE}'"
+                """
+            }
+        }
+
+        stage('UAT Smoke Tests') {
+            steps {
+                echo '🧪 Running smoke tests on UAT...'
+                sh """
+                    sleep 20
+
+                    echo "Test 1 — API Health..."
+                    curl -f --retry 3 --retry-delay 5 \
+                        https://uat.ciscotechnologies.com/api/health
+                    echo "✅ API OK"
+
+                    echo "Test 2 — Frontend..."
+                    curl -f --retry 3 --retry-delay 5 \
+                        https://uat.ciscotechnologies.com
+                    echo "✅ Frontend OK"
+
+                    echo "Test 3 — Ticket creation..."
+                    RESPONSE=\$(curl -sf -X POST \
+                        https://uat.ciscotechnologies.com/api/ticket \
+                        -H 'Content-Type: application/json' \
+                        -d '{"requester":"AutoTest","email":"test@cisco.com","phone":"000","severity":"Low","category":"Other","description":"Automated smoke test"}')
+                    echo \$RESPONSE | grep -q "ticket_id"
+                    echo "✅ Ticket creation OK"
+
+                    echo "🎉 All UAT tests passed — promoting to PROD"
+                """
+            }
+        }
+
+        stage('Create PROD Secrets') {
+            environment {
+                POSTGRES_PASSWORD = credentials('postgres-password')
+                FLASK_SECRET_KEY  = credentials('flask-secret-key')
+                ADMIN_USERNAME    = credentials('admin-username')
+                ADMIN_PASSWORD    = credentials('admin-password')
+                TUNNEL_TOKEN      = credentials('tunnel-token')
+            }
+            steps {
+                echo '🔑 Updating PROD secrets...'
+                sh """
+                    ssh -o StrictHostKeyChecking=no sysadmin@${K8S_MASTER} '
+                        kubectl create secret generic cisco-secrets \
+                            --namespace=${PROD_NAMESPACE} \
+                            --from-literal=POSTGRES_PASSWORD="${POSTGRES_PASSWORD}" \
+                            --from-literal=FLASK_SECRET_KEY="${FLASK_SECRET_KEY}" \
+                            --from-literal=ADMIN_USERNAME="${ADMIN_USERNAME}" \
+                            --from-literal=ADMIN_PASSWORD="${ADMIN_PASSWORD}" \
+                            --from-literal=TUNNEL_TOKEN="${TUNNEL_TOKEN}" \
+                            --dry-run=client -o yaml | kubectl apply -f -
+
+                        kubectl create secret docker-registry ghcr-secret \
+                            --namespace=${PROD_NAMESPACE} \
+                            --docker-server=ghcr.io \
+                            --docker-username=${GHCR_USERNAME} \
+                            --docker-password=${GHCR_TOKEN} \
+                            --dry-run=client -o yaml | kubectl apply -f -
+                    '
+                """
+            }
+        }
+
+        stage('Deploy to PROD') {
+            steps {
+                echo '🚀 Deploying to PROD...'
+                sh """
+                    ssh -o StrictHostKeyChecking=no sysadmin@${ANSIBLE_HOST} \
+                    "ansible-playbook /tmp/cisco-k8s/deploy.yml \
+                        -i /tmp/cisco-k8s/inventory.ini \
+                        --extra-vars 'target_namespace=${PROD_NAMESPACE}'"
+                """
+            }
+        }
+
+        stage('Verify PROD') {
+            steps {
+                echo '✅ Verifying PROD pods...'
+                sh """
+                    ssh -o StrictHostKeyChecking=no sysadmin@${K8S_MASTER} \
+                    'kubectl get pods -n ${PROD_NAMESPACE}'
                 """
             }
         }
@@ -186,10 +289,10 @@ pipeline {
 
     post {
         success {
-            echo '🎉 Deployment successful!'
+            echo '🎉 UAT and PROD both deployed successfully!'
         }
         failure {
-            echo '❌ Deployment failed — check logs above'
+            echo '❌ Pipeline failed — check logs above'
         }
         always {
             sh 'docker logout ghcr.io'

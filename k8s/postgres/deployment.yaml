@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: cisco-postgres
-  namespace: ciscotechnologies
 spec:
   replicas: 1
   selector:
