@@ -6,11 +6,6 @@
     namespace: "{{ target_namespace | default('ciscotechnologies-uat') }}"
 
   tasks:
-
-    - name: Show deployment info
-      debug:
-        msg: "Deploying build {{ image_tag }} to {{ namespace }}"
-
     - name: Apply namespace
       shell: |
         kubectl apply -f /tmp/cisco-k8s/k8s/uat/namespace.yaml
