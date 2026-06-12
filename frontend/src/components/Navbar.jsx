@@ -6,17 +6,15 @@ const links = [
   { to: '/partners', label: 'Partners' },
   { to: '/case-studies', label: 'Case Studies' },
   { to: '/contact', label: 'Contact' },
-  { to: '/support', label: 'Support' },
 ]
 
 export default function Navbar() {
   const { pathname } = useLocation()
 
   return (
-    <nav style={{ background: '#fff', borderBottom: '1px solid #e0e0e0', position: 'sticky', top: 0, zIndex: 100, boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+    <nav style={{ background: '#fff', borderBottom: '1px solid #e0e0e0', position: 'sticky', top: 0, zIndex: 100, boxShadow: '0 1px 4px rgba(0,0,0,.06)' }}>
       <div style={{ maxWidth: 1140, margin: '0 auto', padding: '0 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 64 }}>
 
-        {/* Logo */}
         <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <div style={{ width: 36, height: 36, background: '#00bceb', borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
@@ -29,7 +27,6 @@ export default function Navbar() {
           </div>
         </Link>
 
-        {/* Nav Links — Admin removed */}
         <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
           {links.map(l => (
             <Link key={l.to} to={l.to} style={{
@@ -38,9 +35,13 @@ export default function Navbar() {
               background: pathname === l.to ? '#e6f7fc' : 'transparent',
               fontWeight: pathname === l.to ? 600 : 400,
               borderBottom: pathname === l.to ? '2px solid #00bceb' : '2px solid transparent',
-              transition: 'all 0.15s'
+              transition: 'all .15s'
             }}>{l.label}</Link>
           ))}
+          <a href="https://support.ciscotechnologies.com" style={{
+            marginLeft: 8, padding: '8px 18px', borderRadius: 4,
+            background: '#00bceb', color: '#fff', fontWeight: 600, fontSize: '0.88rem'
+          }}>Support Portal</a>
         </div>
       </div>
     </nav>

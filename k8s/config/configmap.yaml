@@ -7,3 +7,4 @@ data:
   DB_NAME: "cisco_architecture"
   DB_USER: "cisco_admin"
   FLASK_ENV: "production"
+  SF_ENABLED: "true"

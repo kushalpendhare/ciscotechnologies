@@ -1,3 +1,6 @@
+import { useState } from 'react'
+import axios from 'axios'
+
 const info = [
   { icon: '📧', label: 'General Enquiries', value: 'info@ciscotechnologies.com' },
   { icon: '🛠️', label: 'Technical Support', value: 'support@ciscotechnologies.com' },
@@ -8,6 +11,28 @@ const info = [
 ]
 
 export default function Contact() {
+  const [form, setForm] = useState({ name: '', email: '', company: '', phone: '', message: '' })
+  const [sent, setSent] = useState(false)
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  const submit = async () => {
+    setError('')
+    if (!form.name || !form.email || !form.company || !form.message) {
+      setError('Please fill in all required fields.')
+      return
+    }
+    setLoading(true)
+    try {
+      await axios.post('/api/contact', form)
+      setSent(true)
+      setForm({ name: '', email: '', company: '', phone: '', message: '' })
+    } catch {
+      setError('Something went wrong. Please try again or email us directly.')
+    }
+    setLoading(false)
+  }
+
   return (
     <div className="page">
       <p className="section-title">Contact Us</p>
@@ -19,21 +44,41 @@ export default function Contact() {
             <span style={{ fontSize: '1.8rem' }}>{i.icon}</span>
             <div>
               <p style={{ color: '#64748b', fontSize: '0.8rem', marginBottom: 4 }}>{i.label}</p>
-              <p style={{ fontWeight: 600, color: '#e2e8f0' }}>{i.value}</p>
+              <p style={{ fontWeight: 600, color: '#1a1a1a' }}>{i.value}</p>
             </div>
           </div>
         ))}
       </div>
 
       <div className="card" style={{ maxWidth: 600 }}>
-        <p style={{ fontWeight: 700, fontSize: '1.1rem', marginBottom: 4 }}>Office Location</p>
-        <p style={{ color: '#64748b', marginBottom: 16 }}>Headquarters</p>
-        <p style={{ color: '#94a3b8', lineHeight: 1.8 }}>
-          CiscoTechnologies Inc.<br />
-          123 Innovation Drive, Suite 400<br />
-          San Jose, CA 95134<br />
-          United States
-        </p>
+        <p style={{ fontWeight: 700, fontSize: '1.1rem', marginBottom: 16 }}>Send Us a Message</p>
+
+        {sent && <div className="alert alert-success">✅ Thanks! Our team will be in touch shortly.</div>}
+        {error && <div className="alert alert-error">⚠️ {error}</div>}
+
+        <label>Full Name *</label>
+        <input placeholder="John Smith" value={form.name}
+          onChange={e => setForm({ ...form, name: e.target.value })} />
+
+        <label>Email *</label>
+        <input type="email" placeholder="john@company.com" value={form.email}
+          onChange={e => setForm({ ...form, email: e.target.value })} />
+
+        <label>Company *</label>
+        <input placeholder="Acme Corp" value={form.company}
+          onChange={e => setForm({ ...form, company: e.target.value })} />
+
+        <label>Phone</label>
+        <input placeholder="+1 555 000 0000" value={form.phone}
+          onChange={e => setForm({ ...form, phone: e.target.value })} />
+
+        <label>Message *</label>
+        <textarea rows={4} placeholder="How can we help?" value={form.message}
+          onChange={e => setForm({ ...form, message: e.target.value })} />
+
+        <button className="btn btn-primary" onClick={submit} disabled={loading} style={{ width: '100%', padding: 12 }}>
+          {loading ? 'Sending...' : 'Send Message'}
+        </button>
       </div>
     </div>
   )

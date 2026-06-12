@@ -163,6 +163,11 @@ pipeline {
                 ADMIN_USERNAME    = credentials('admin-username')
                 ADMIN_PASSWORD    = credentials('admin-password')
                 TUNNEL_TOKEN      = credentials('tunnel-token')
+                SF_CLIENT_ID      = credentials('sf-client-id')
+                SF_CLIENT_SECRET  = credentials('sf-client-secret')
+                SF_USERNAME       = credentials('sf-username')
+                SF_PASSWORD_TOKEN = credentials('sf-password-token')
+                SF_INSTANCE_URL   = credentials('sf-instance-url')
             }
             steps {
                 echo '🔑 Creating UAT secrets...'
@@ -178,6 +183,11 @@ pipeline {
                             --from-literal=ADMIN_USERNAME="${ADMIN_USERNAME}" \
                             --from-literal=ADMIN_PASSWORD="${ADMIN_PASSWORD}" \
                             --from-literal=TUNNEL_TOKEN="${TUNNEL_TOKEN}" \
+                            --from-literal=SF_CLIENT_ID="${SF_CLIENT_ID}" \
+                            --from-literal=SF_CLIENT_SECRET="${SF_CLIENT_SECRET}" \
+                            --from-literal=SF_USERNAME="${SF_USERNAME}" \
+                            --from-literal=SF_PASSWORD_TOKEN="${SF_PASSWORD_TOKEN}" \
+                            --from-literal=SF_INSTANCE_URL="${SF_INSTANCE_URL}" \
                             --dry-run=client -o yaml | kubectl apply -f -
 
                         kubectl create secret docker-registry ghcr-secret \
@@ -239,6 +249,11 @@ pipeline {
                 ADMIN_USERNAME    = credentials('admin-username')
                 ADMIN_PASSWORD    = credentials('admin-password')
                 TUNNEL_TOKEN      = credentials('tunnel-token')
+                SF_CLIENT_ID      = credentials('sf-client-id')
+                SF_CLIENT_SECRET  = credentials('sf-client-secret')
+                SF_USERNAME       = credentials('sf-username')
+                SF_PASSWORD_TOKEN = credentials('sf-password-token')
+                SF_INSTANCE_URL   = credentials('sf-instance-url')
             }
             steps {
                 echo '🔑 Updating PROD secrets...'
@@ -251,6 +266,11 @@ pipeline {
                             --from-literal=ADMIN_USERNAME="${ADMIN_USERNAME}" \
                             --from-literal=ADMIN_PASSWORD="${ADMIN_PASSWORD}" \
                             --from-literal=TUNNEL_TOKEN="${TUNNEL_TOKEN}" \
+                            --from-literal=SF_CLIENT_ID="${SF_CLIENT_ID}" \
+                            --from-literal=SF_CLIENT_SECRET="${SF_CLIENT_SECRET}" \
+                            --from-literal=SF_USERNAME="${SF_USERNAME}" \
+                            --from-literal=SF_PASSWORD_TOKEN="${SF_PASSWORD_TOKEN}" \
+                            --from-literal=SF_INSTANCE_URL="${SF_INSTANCE_URL}" \
                             --dry-run=client -o yaml | kubectl apply -f -
 
                         kubectl create secret docker-registry ghcr-secret \

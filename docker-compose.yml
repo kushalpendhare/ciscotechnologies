@@ -38,6 +38,11 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       DB_HOST: db
       FLASK_SECRET_KEY: ${FLASK_SECRET_KEY}
+      SF_CLIENT_ID: ${SF_CLIENT_ID}
+      SF_CLIENT_SECRET: ${SF_CLIENT_SECRET}
+      SF_USERNAME: ${SF_USERNAME}
+      SF_PASSWORD_TOKEN: ${SF_PASSWORD_TOKEN}
+      SF_INSTANCE_URL: ${SF_INSTANCE_URL}
       ADMIN_USERNAME: ${ADMIN_USERNAME}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
     depends_on:
@@ -82,7 +87,7 @@ services:
     restart: always
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@ciscotechnologies.com
-      PGADMIN_DEFAULT_PASSWORD: ${ADMIN_PASSWORD}
+      PGADMIN_DEFAULT_PASSWORD: CiscoAdmin123!
     ports:
       - "5050:80"
     networks:
