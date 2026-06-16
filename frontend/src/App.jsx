@@ -5,17 +5,38 @@ import Solutions from './pages/Solutions'
 import Partners from './pages/Partners'
 import CaseStudies from './pages/CaseStudies'
 import Contact from './pages/Contact'
+import AdminPortal from './pages/AdminPortal'
+import SupportPortal from './pages/SupportPortal'
+
+const hostname = window.location.hostname
+const isAdmin   = hostname.startsWith('admin.')
+const isSupport = hostname.startsWith('support.')
 
 function App() {
+  if (isAdmin) return (
+    <Router>
+      <Routes>
+        <Route path="*" element={<AdminPortal />} />
+      </Routes>
+    </Router>
+  )
+  if (isSupport) return (
+    <Router>
+      <Routes>
+        <Route path="*" element={<SupportPortal />} />
+      </Routes>
+    </Router>
+  )
+
   return (
     <Router>
       <Navbar />
       <Routes>
-        <Route path="/"            element={<Home />} />
-        <Route path="/solutions"   element={<Solutions />} />
-        <Route path="/partners"    element={<Partners />} />
+        <Route path="/"             element={<Home />} />
+        <Route path="/solutions"    element={<Solutions />} />
+        <Route path="/partners"     element={<Partners />} />
         <Route path="/case-studies" element={<CaseStudies />} />
-        <Route path="/contact"     element={<Contact />} />
+        <Route path="/contact"      element={<Contact />} />
       </Routes>
     </Router>
   )

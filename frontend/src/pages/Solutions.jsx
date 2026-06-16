@@ -45,7 +45,7 @@ export default function Solutions() {
 
       <div className="grid-2">
         {solutions.map(s => (
-          <div key={s.title} className="card">
+          <div key={s.title} className="card card-hover">
             <span className={`badge ${s.badge}`}>{s.badgeText}</span>
             <p style={{ fontWeight: 700, fontSize: '1.1rem', marginBottom: 4 }}>{s.title}</p>
             <p style={{ color: '#94a3b8', fontSize: '0.9rem', marginBottom: 16 }}>{s.desc}</p>

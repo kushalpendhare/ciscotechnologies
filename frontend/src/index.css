@@ -194,3 +194,39 @@ footer a { color: #00bceb; }
 .case-card-top { background: linear-gradient(135deg, #00bceb, #0078d4); padding: 24px; }
 .case-card-body { padding: 24px; }
 .outcome-box { background: #e6f7f0; border-radius: 6px; padding: 12px 16px; margin-top: 16px; }
+.card-hover {
+  position: relative;
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.28s ease;
+  cursor: default;
+}
+
+.card-hover::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(0, 188, 235, 0.08), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.28s ease;
+  pointer-events: none;
+}
+
+.card-hover:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 32px -8px rgba(0, 188, 235, 0.18), 0 4px 12px rgba(0,0,0,0.06);
+  border-color: rgba(0, 188, 235, 0.4);
+}
+
+.card-hover:hover::before {
+  opacity: 1;
+}
+
+.card-hover .badge {
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card-hover:hover .badge {
+  transform: scale(1.05);
+}
