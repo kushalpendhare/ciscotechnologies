@@ -1,3 +1,6 @@
+import PageHero from '../components/PageHero'
+import Footer from '../components/Footer'
+
 const solutions = [
   {
     badge: 'badge-blue', badgeText: 'Unified Communications',
@@ -39,24 +42,29 @@ const solutions = [
 
 export default function Solutions() {
   return (
-    <div className="page">
-      <p className="section-title">Our Solutions</p>
-      <p className="section-sub">Purpose-built offerings across UC, CC, and managed services</p>
+    <>
+      <PageHero
+        eyebrow="What We Offer"
+        title="Our Solutions"
+        subtitle="Purpose-built offerings across UC, CC, and managed services — designed for enterprise scale."
+      />
 
-      <div className="grid-2">
-        {solutions.map(s => (
-          <div key={s.title} className="card card-hover">
-            <span className={`badge ${s.badge}`}>{s.badgeText}</span>
-            <p style={{ fontWeight: 700, fontSize: '1.1rem', marginBottom: 4 }}>{s.title}</p>
-            <p style={{ color: '#94a3b8', fontSize: '0.9rem', marginBottom: 16 }}>{s.desc}</p>
-            <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 6 }}>
-              {s.features.map(f => (
-                <li key={f} style={{ color: '#64748b', fontSize: '0.85rem' }}>✓ {f}</li>
-              ))}
-            </ul>
-          </div>
-        ))}
+      <div className="page">
+        <div className="grid-2">
+          {solutions.map(s => (
+            <div key={s.title} className="card card-hover">
+              <span className={`badge ${s.badge}`}>{s.badgeText}</span>
+              <p className="solution-title">{s.title}</p>
+              <p className="solution-desc">{s.desc}</p>
+              <ul className="feature-list">
+                {s.features.map(f => <li key={f}>{f}</li>)}
+              </ul>
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
+
+      <Footer />
+    </>
   )
 }

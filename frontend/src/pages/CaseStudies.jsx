@@ -1,5 +1,7 @@
 import { useEffect, useState, useRef } from 'react'
 import axios from 'axios'
+import PageHero from '../components/PageHero'
+import Footer from '../components/Footer'
 
 const fallback = [
   { id: 1, title: 'Avaya to Cisco Migration', client: 'Financial Services Co.', summary: 'Full UC migration from Avaya to Cisco Webex Calling across 3 sites, 1,800 users migrated with zero downtime cutover.', outcome: 'Reduced telephony costs by 40%', badge: 'badge-blue', icon: '🏦', duration: '6 months', users: '1,800' },
@@ -33,15 +35,15 @@ function CaseCard({ study, index }) {
         <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.85rem' }}>Client: {study.client}</p>
       </div>
       <div className="case-card-body">
-        <p style={{ color: '#555', fontSize: '0.9rem', lineHeight: 1.7, marginBottom: 16 }}>{study.summary}</p>
+        <p style={{ color: '#475569', fontSize: '0.92rem', lineHeight: 1.7, marginBottom: 16 }}>{study.summary}</p>
         {(study.duration || study.users) && (
           <div style={{ display: 'flex', gap: 16, marginBottom: 12 }}>
-            {study.duration && <span style={{ fontSize: '0.8rem', color: '#888' }}>⏱ {study.duration}</span>}
-            {study.users && <span style={{ fontSize: '0.8rem', color: '#888' }}>👥 {study.users} users</span>}
+            {study.duration && <span style={{ fontSize: '0.8rem', color: '#64748b' }}>⏱ {study.duration}</span>}
+            {study.users && <span style={{ fontSize: '0.8rem', color: '#64748b' }}>👥 {study.users} users</span>}
           </div>
         )}
         <div className="outcome-box">
-          <p style={{ color: '#007a3d', fontSize: '0.88rem', fontWeight: 600 }}>📈 Outcome: {study.outcome}</p>
+          <p style={{ color: '#15803d', fontSize: '0.88rem', fontWeight: 600 }}>📈 Outcome: {study.outcome}</p>
         </div>
       </div>
     </div>
@@ -59,11 +61,11 @@ export default function CaseStudies() {
 
   return (
     <>
-      <div style={{ background: '#1a1a1a', padding: '64px 24px 48px', textAlign: 'center' }}>
-        <p style={{ color: '#00bceb', fontWeight: 600, fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>Client Success</p>
-        <h1 style={{ fontSize: '2.4rem', fontWeight: 800, color: '#fff', marginBottom: 16 }}>Case Studies</h1>
-        <p style={{ color: '#aaa', maxWidth: 540, margin: '0 auto' }}>Real outcomes delivered for our clients across UC, CC, and managed services.</p>
-      </div>
+      <PageHero
+        eyebrow="Client Success"
+        title="Case Studies"
+        subtitle="Real outcomes delivered for our clients across UC, CC, and managed services."
+      />
 
       <div className="page">
         <div className="grid-2">
@@ -71,7 +73,7 @@ export default function CaseStudies() {
         </div>
       </div>
 
-      <footer><p>© 2025 Cisco Technologies. All rights reserved.</p></footer>
+      <Footer />
     </>
   )
 }

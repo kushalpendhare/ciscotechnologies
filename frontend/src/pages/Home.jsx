@@ -1,31 +1,32 @@
 import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
+import Footer from '../components/Footer'
 
 const slides = [
   {
     tag: 'Unified Communications',
-    title: 'Modernize Your Communications Infrastructure',
+    title: <>Modernize Your <span>Communications</span> Infrastructure</>,
     desc: 'We help enterprises migrate from legacy PBX systems to cloud-first unified communications platforms with zero business disruption.',
     icon: '📞',
     cta: { label: 'Explore Solutions', to: '/solutions' }
   },
   {
     tag: 'Contact Center',
-    title: 'Transform Your Customer Experience',
+    title: <>Transform Your <span>Customer Experience</span></>,
     desc: 'Deploy omnichannel contact center solutions powered by Cisco, Genesys, and NICE — from design to go-live in weeks.',
     icon: '🎧',
     cta: { label: 'View Case Studies', to: '/case-studies' }
   },
   {
     tag: 'Managed Services',
-    title: '24/7 Managed Support for On-Premises UC',
+    title: <><span>24/7</span> Managed Support for On-Premises UC</>,
     desc: 'Proactive monitoring, patching, and incident response keeping your on-prem Cisco and Avaya infrastructure healthy around the clock.',
     icon: '🛡️',
     cta: { label: 'Our Partners', to: '/partners' }
   },
   {
     tag: 'Cloud Migration',
-    title: 'Your Journey to the Cloud Starts Here',
+    title: <>Your Journey to the <span>Cloud</span> Starts Here</>,
     desc: 'Structured migration paths from Avaya Aura, Cisco CUCM, or any legacy platform to modern cloud communications.',
     icon: '☁️',
     cta: { label: 'Contact Us', to: '/contact' }
@@ -58,71 +59,76 @@ export default function Home() {
 
   return (
     <>
-      {/* Hero Slider */}
-      <div className="hero-slider" style={{ borderBottom: '1px solid #e0e0e0' }}>
+      <div className="hero-slider">
         {slides.map((s, i) => (
           <div key={i} className={`hero-slide ${i === active ? 'active' : ''}`}>
             <div>
-              <span className="badge badge-blue" style={{ marginBottom: 16 }}>{s.tag}</span>
+              <span className="badge badge-blue">{s.tag}</span>
               <h1>{s.title}</h1>
               <p>{s.desc}</p>
               <Link to={s.cta.to} className="btn btn-primary">{s.cta.label}</Link>
             </div>
-            <div className="hero-visual">{s.icon}</div>
+            <div className="hero-visual">
+              <div className="hero-visual-grid" aria-hidden="true" />
+              <div className="hero-visual-glow" aria-hidden="true" />
+              <span className="hero-visual-icon">{s.icon}</span>
+            </div>
           </div>
         ))}
         <div className="slider-dots">
           {slides.map((_, i) => (
-            <button key={i} className={`slider-dot ${i === active ? 'active' : ''}`} onClick={() => setActive(i)} />
+            <button
+              key={i}
+              type="button"
+              aria-label={`Go to slide ${i + 1}`}
+              className={`slider-dot ${i === active ? 'active' : ''}`}
+              onClick={() => setActive(i)}
+            />
           ))}
         </div>
       </div>
 
-      {/* Stats Bar */}
-      <div style={{ background: '#00bceb', padding: '24px 0' }}>
-        <div style={{ maxWidth: 1140, margin: '0 auto', padding: '0 24px', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 24, textAlign: 'center' }}>
+      <div className="stats-bar">
+        <div className="stats-bar-inner">
           {stats.map(s => (
             <div key={s.label}>
-              <div style={{ fontSize: '2rem', fontWeight: 800, color: '#fff' }}>{s.value}</div>
-              <div style={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.9rem' }}>{s.label}</div>
+              <div className="stat-value">{s.value}</div>
+              <div className="stat-label">{s.label}</div>
             </div>
           ))}
         </div>
       </div>
 
       <div className="page">
-        {/* Services */}
-        <div style={{ marginBottom: 80 }}>
+        <div className="section-header centered" style={{ marginBottom: 56 }}>
+          <span className="section-eyebrow">Our Expertise</span>
           <p className="section-title">What We Do</p>
           <p className="section-sub">Full lifecycle services from design to managed support</p>
-          <div className="grid-3">
-            {services.map((s, i) => (
-              <div key={s.title} className="card animate-fade-up" style={{ animationDelay: `${i * 0.08}s` }}>
-                <div style={{ fontSize: '2rem', marginBottom: 12 }}>{s.icon}</div>
-                <p style={{ fontWeight: 700, fontSize: '1rem', marginBottom: 8, color: '#1a1a1a' }}>{s.title}</p>
-                <p style={{ color: '#666', fontSize: '0.9rem', lineHeight: 1.6 }}>{s.desc}</p>
-              </div>
-            ))}
-          </div>
         </div>
 
-        {/* CTA Banner */}
-        <div style={{ background: '#1a1a1a', borderRadius: 12, padding: '48px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 24 }}>
+        <div className="grid-3" style={{ marginBottom: 80 }}>
+          {services.map((s, i) => (
+            <div key={s.title} className="card service-card animate-fade-up" style={{ animationDelay: `${i * 0.08}s` }}>
+              <div className="service-icon">{s.icon}</div>
+              <p className="service-title">{s.title}</p>
+              <p className="service-desc">{s.desc}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="cta-banner">
           <div>
-            <p style={{ fontSize: '1.5rem', fontWeight: 700, color: '#fff', marginBottom: 8 }}>Ready to transform your communications?</p>
-            <p style={{ color: '#aaa' }}>Talk to one of our UC & CC specialists today.</p>
+            <p className="cta-banner-title">Ready to transform your communications?</p>
+            <p className="cta-banner-sub">Talk to one of our UC & CC specialists today.</p>
           </div>
-          <div style={{ display: 'flex', gap: 12 }}>
+          <div className="cta-banner-actions">
             <Link to="/contact" className="btn btn-primary">Get in Touch</Link>
-            <Link to="/solutions" className="btn btn-outline">View Solutions</Link>
+            <Link to="/solutions" className="btn btn-ghost-light">View Solutions</Link>
           </div>
         </div>
       </div>
 
-      <footer>
-        <p>© 2025 Cisco Technologies. All rights reserved.</p>
-        <p style={{ marginTop: 8 }}><Link to="/contact">Contact</Link> · <Link to="/support">Support</Link> · <Link to="/admin">Admin</Link></p>
-      </footer>
+      <Footer />
     </>
   )
 }
