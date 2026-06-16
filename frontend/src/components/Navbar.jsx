@@ -1,4 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
+import { useState, useEffect } from 'react'
 
 const links = [
   { to: '/', label: 'Home' },
@@ -10,6 +11,16 @@ const links = [
 
 export default function Navbar() {
   const { pathname } = useLocation()
+  const [menuOpen, setMenuOpen] = useState(false)
+
+  useEffect(() => {
+    setMenuOpen(false)
+  }, [pathname])
+
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? 'hidden' : ''
+    return () => { document.body.style.overflow = '' }
+  }, [menuOpen])
 
   return (
     <nav className="navbar">
@@ -37,6 +48,34 @@ export default function Navbar() {
             </Link>
           ))}
           <a href="https://support.ciscotechnologies.com" className="navbar-cta">
+            Support Portal
+          </a>
+        </div>
+
+        <button
+          type="button"
+          className={`navbar-toggle${menuOpen ? ' open' : ''}`}
+          aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+          aria-expanded={menuOpen}
+          onClick={() => setMenuOpen(o => !o)}
+        >
+          <span /><span /><span />
+        </button>
+      </div>
+
+      <div className={`navbar-mobile${menuOpen ? ' open' : ''}`} aria-hidden={!menuOpen}>
+        <div className="navbar-mobile-inner">
+          {links.map((l, i) => (
+            <Link
+              key={l.to}
+              to={l.to}
+              className={`navbar-mobile-link${pathname === l.to ? ' active' : ''}`}
+              style={{ '--i': i }}
+            >
+              {l.label}
+            </Link>
+          ))}
+          <a href="https://support.ciscotechnologies.com" className="navbar-mobile-cta">
             Support Portal
           </a>
         </div>

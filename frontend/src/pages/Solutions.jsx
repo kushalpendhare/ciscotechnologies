@@ -1,5 +1,6 @@
 import PageHero from '../components/PageHero'
 import Footer from '../components/Footer'
+import ScrollReveal from '../components/ScrollReveal'
 
 const solutions = [
   {
@@ -51,15 +52,17 @@ export default function Solutions() {
 
       <div className="page">
         <div className="grid-2">
-          {solutions.map(s => (
-            <div key={s.title} className="card card-hover">
-              <span className={`badge ${s.badge}`}>{s.badgeText}</span>
-              <p className="solution-title">{s.title}</p>
-              <p className="solution-desc">{s.desc}</p>
-              <ul className="feature-list">
-                {s.features.map(f => <li key={f}>{f}</li>)}
-              </ul>
-            </div>
+          {solutions.map((s, i) => (
+            <ScrollReveal key={s.title} delay={i * 0.06}>
+              <div className="card card-hover hover-lift">
+                <span className={`badge ${s.badge}`}>{s.badgeText}</span>
+                <p className="solution-title">{s.title}</p>
+                <p className="solution-desc">{s.desc}</p>
+                <ul className="feature-list">
+                  {s.features.map(f => <li key={f}>{f}</li>)}
+                </ul>
+              </div>
+            </ScrollReveal>
           ))}
         </div>
       </div>
