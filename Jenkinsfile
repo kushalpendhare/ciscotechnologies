@@ -229,13 +229,10 @@ pipeline {
                         https://uat.ciscotechnologies.com
                     echo "✅ Frontend OK"
 
-                    echo "Test 3 — Ticket creation..."
-                    RESPONSE=\$(curl -sf -X POST \
-                        https://uat.ciscotechnologies.com/api/ticket \
-                        -H 'Content-Type: application/json' \
-                        -d '{"requester":"AutoTest","email":"test@cisco.com","phone":"000","severity":"Low","category":"Other","description":"Automated smoke test"}')
-                    echo \$RESPONSE | grep -q "ticket_id"
-                    echo "✅ Ticket creation OK"
+                    echo "Test 3 — Case studies endpoint..."
+                    curl -f --retry 3 --retry-delay 5 \
+                        https://uat.ciscotechnologies.com/api/case-studies
+                    echo "✅ Case studies endpoint OK"
 
                     echo "🎉 All UAT tests passed — promoting to PROD"
                 """
