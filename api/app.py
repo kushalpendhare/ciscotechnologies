@@ -10,9 +10,85 @@ import psycopg2
 import psycopg2.extras
 from simple_salesforce import Salesforce
 from simple_salesforce.exceptions import SalesforceError
+from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
 
 app = Flask(__name__)
 CORS(app)
+
+REQUEST_COUNT = Counter(
+    'cisco_api_requests_total',
+    'Total HTTP requests',
+    ['method', 'endpoint', 'status']
+)
+REQUEST_LATENCY = Histogram(
+    'cisco_api_request_latency_seconds',
+    'Request latency in seconds',
+    ['method', 'endpoint']
+)
+SF_CALL_COUNT = Counter(
+    'cisco_sf_calls_total',
+    'Total Salesforce API calls',
+    ['operation', 'status']
+)
+SF_CALL_LATENCY = Histogram(
+    'cisco_sf_call_latency_seconds',
+    'Salesforce API call latency in seconds',
+    ['operation']
+)
+DB_CALL_LATENCY = Histogram(
+    'cisco_db_query_latency_seconds',
+    'PostgreSQL query latency in seconds',
+    ['operation']
+)
+ 
+# ── Before/after request hooks — auto-instruments EVERY route ──
+@app.before_request
+def _start_timer():
+    request._prom_start_time = time.time()
+ 
+@app.after_request
+def _record_request_metrics(response):
+    if hasattr(request, '_prom_start_time'):
+        latency = time.time() - request._prom_start_time
+        endpoint = request.endpoint or 'unmatched'
+        REQUEST_LATENCY.labels(method=request.method, endpoint=endpoint).observe(latency)
+        REQUEST_COUNT.labels(method=request.method, endpoint=endpoint, status=response.status_code).inc()
+    return response
+ 
+# ── Metrics scrape endpoint — this is what Prometheus hits ──
+@app.route('/metrics')
+def metrics():
+    return generate_latest(), 200, {'Content-Type': CONTENT_TYPE_LATEST}
+ 
+ 
+# ══════════════════════════════════════════════════════════════
+# OPTIONAL — wrap Salesforce calls to track SF-specific latency.
+# Use like:   with sf_timer('create_case'): sf.Case.create({...})
+# Drop this near your get_sf() function.
+# ══════════════════════════════════════════════════════════════
+from contextlib import contextmanager
+ 
+@contextmanager
+def sf_timer(operation):
+    start = time.time()
+    status = 'success'
+    try:
+        yield
+    except Exception:
+        status = 'error'
+        raise
+    finally:
+        SF_CALL_LATENCY.labels(operation=operation).observe(time.time() - start)
+        SF_CALL_COUNT.labels(operation=operation, status=status).inc()
+ 
+# Example usage inside an existing route:
+#
+#   with sf_timer('create_case'):
+#       case = sf.Case.create({...})
+#
+# This is optional polish — the before/after request hooks above
+# already give you per-endpoint latency/error rate for free,
+# without touching a single existing route.
 
 SECRET_KEY        = os.getenv("FLASK_SECRET_KEY", "cisco-dev-secret")
 DB_USER           = os.getenv("POSTGRES_USER", "cisco_admin")

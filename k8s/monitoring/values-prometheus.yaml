@@ -1,0 +1,60 @@
+# k8s/monitoring/values-prometheus.yaml
+#
+# Values file for the community "kube-prometheus-stack" Helm chart.
+# This single chart installs Prometheus + Grafana + Alertmanager +
+# node-exporter + kube-state-metrics in one shot — it's the de facto
+# standard way to get monitoring onto a K8s cluster.
+
+grafana:
+  enabled: true
+  adminPassword: "CHANGE_ME_GRAFANA_PASSWORD"   # override via --set or secret in Jenkins
+  service:
+    type: ClusterIP
+  persistence:
+    enabled: true
+    size: 2Gi
+  defaultDashboardsEnabled: true
+
+prometheus:
+  prometheusSpec:
+    retention: 7d
+    resources:
+      requests:
+        cpu: 200m
+        memory: 512Mi
+      limits:
+        cpu: 500m
+        memory: 1Gi
+    # Allow Prometheus to discover ServiceMonitors from ANY namespace
+    # (so it picks up cisco-api in both ciscotechnologies-uat and
+    # ciscotechnologies / PROD without extra config per namespace)
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 5Gi
+
+alertmanager:
+  enabled: true
+  config:
+    global:
+      resolve_timeout: 5m
+    route:
+      receiver: 'default'
+      group_by: ['alertname', 'namespace']
+    receivers:
+      - name: 'default'
+        # Add Slack/email webhook here later, e.g.:
+        # slack_configs:
+        #   - api_url: 'https://hooks.slack.com/services/XXX'
+        #     channel: '#cisco-alerts'
+
+nodeExporter:
+  enabled: true
+
+kubeStateMetrics:
+  enabled: true

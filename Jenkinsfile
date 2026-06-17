@@ -155,6 +155,40 @@ pipeline {
                 """
             }
         }
+        stage('Deploy Monitoring Stack') {
+            environment {
+                GRAFANA_ADMIN_PASSWORD = credentials('grafana-admin-password')
+                }
+             steps {
+                echo '📊 Installing/upgrading Prometheus + Grafana via Helm...'
+                sh """
+                    scp -o StrictHostKeyChecking=no -r k8s/monitoring/ \
+                    sysadmin@${K8S_MASTER}:/tmp/cisco-k8s-monitoring/
+ 
+                    ssh -o StrictHostKeyChecking=no sysadmin@${K8S_MASTER} '
+                    helm repo add prometheus-community https://prometheus-community.github.io/helm-charts || true
+                    helm repo update
+ 
+                    kubectl create namespace monitoring \
+                    --dry-run=client -o yaml | kubectl apply -f -
+ 
+                    helm upgrade --install prometheus prometheus-community/kube-prometheus-stack \
+                    --namespace monitoring \
+                    -f /tmp/cisco-k8s-monitoring/monitoring/values-prometheus.yaml \
+                    --set grafana.adminPassword="${GRAFANA_ADMIN_PASSWORD}" \
+                    --wait --timeout 5m
+ 
+                    echo "Applying ServiceMonitor to UAT namespace..."
+                    kubectl apply -f /tmp/cisco-k8s-monitoring/monitoring/servicemonitor-cisco-api.yaml \
+                    -n ${UAT_NAMESPACE}
+ 
+                    echo "Applying ServiceMonitor to PROD namespace..."
+                    kubectl apply -f /tmp/cisco-k8s-monitoring/monitoring/servicemonitor-cisco-api.yaml \
+                    -n ${PROD_NAMESPACE}
+                    '
+                """
+            }
+        }
 
         stage('Create UAT Secrets') {
             environment {
