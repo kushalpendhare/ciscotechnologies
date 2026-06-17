@@ -12,6 +12,7 @@ grafana:
     type: ClusterIP
   persistence:
     enabled: true
+    storageClassName: local-path
     size: 2Gi
   defaultDashboardsEnabled: true
 
