@@ -22,3 +22,53 @@ frontend/.env
 # OS
 .DS_Store
 Thumbs.dbk8s/config/secret.yaml
+
+# terraform/.gitignore
+# Never commit Terraform state, credentials, or sensitive files to Git
+
+# Terraform state files
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+
+# Variable files with secrets
+*.tfvars
+!example.tfvars
+
+# Environment-specific files
+environments/*/terraform.tfvars
+environments/*/.terraform/
+environments/*/.terraform.lock.hcl
+
+# OS files
+.DS_Store
+*.swp
+*.swo
+*~
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# Crash logs
+crash.log
+crash.*.log
+
+# Ignore override files (used to override values in CI)
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Ignore CLI configuration files
+.terraformrc
+terraform.rc
+
+# Ignore plan files
+*.tfplan
+*.out
+
+# Ignore lock files from modules
+**/modules/.terraform.lock.hcl
