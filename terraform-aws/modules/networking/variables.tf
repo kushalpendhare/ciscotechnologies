@@ -7,10 +7,6 @@ variable "project_name" {
   type = string
 }
 
-variable "container_port" {
-  type = number
-}
-
 variable "enable_nat_gateway" {
   type = bool
 }

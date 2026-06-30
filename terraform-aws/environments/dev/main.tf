@@ -6,7 +6,6 @@ module "networking" {
 
   vpc_cidr            = var.vpc_cidr
   project_name        = var.project_name
-  container_port      = var.container_port
   enable_nat_gateway  = var.enable_nat_gateway
 }
 
@@ -58,7 +57,8 @@ module "ecs" {
   private_subnet_ids               = module.networking.private_subnet_ids
   alb_security_group_id            = module.networking.alb_security_group_id
   ecs_tasks_security_group_id      = module.networking.ecs_tasks_security_group_id
-  container_port                   = var.container_port
+  frontend_port                    = var.frontend_port
+  api_port                         = var.api_port
   api_image                        = var.api_image
   frontend_image                   = var.frontend_image
   ecs_task_execution_role_arn      = module.iam.ecs_task_execution_role_arn

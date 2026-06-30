@@ -27,7 +27,11 @@ variable "ecs_tasks_security_group_id" {
   type = string
 }
 
-variable "container_port" {
+variable "frontend_port" {
+  type = number
+}
+
+variable "api_port" {
   type = number
 }
 

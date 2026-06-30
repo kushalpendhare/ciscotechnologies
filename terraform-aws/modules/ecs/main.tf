@@ -58,7 +58,7 @@ resource "aws_lb" "main" {
 # Target group for API
 resource "aws_lb_target_group" "api" {
   name_prefix = "api"
-  port        = var.container_port
+  port        = 5000
   protocol    = "HTTP"
   vpc_id      = var.vpc_id
   target_type = "ip"
@@ -148,8 +148,8 @@ resource "aws_ecs_task_definition" "api" {
     image     = var.api_image
     essential = true
     portMappings = [{
-      containerPort = var.container_port
-      hostPort      = var.container_port
+      containerPort = var.api_port
+      hostPort      = var.api_port
       protocol      = "tcp"
     }]
 
@@ -200,8 +200,8 @@ resource "aws_ecs_task_definition" "frontend" {
     image     = var.frontend_image
     essential = true
     portMappings = [{
-      containerPort = 80
-      hostPort      = 80
+      containerPort = var.frontend_port
+      hostPort      = var.frontend_port
       protocol      = "tcp"
     }]
 
@@ -241,7 +241,7 @@ resource "aws_ecs_service" "api" {
   load_balancer {
     target_group_arn = aws_lb_target_group.api.arn
     container_name   = "api"
-    container_port   = var.container_port
+    container_port   = var.api_port
   }
 
   depends_on = [aws_lb_listener.http]
@@ -268,7 +268,7 @@ resource "aws_ecs_service" "frontend" {
   load_balancer {
     target_group_arn = aws_lb_target_group.frontend.arn
     container_name   = "frontend"
-    container_port   = 80
+    container_port   = var.frontend_port
   }
 
   depends_on = [aws_lb_listener.http]
@@ -320,5 +320,37 @@ resource "aws_appautoscaling_policy" "api_memory" {
       predefined_metric_type = "ECSServiceAverageMemoryUtilization"
     }
     target_value = 80.0
+  }
+}
+resource "aws_lb_listener_rule" "support_subdomain" {
+  listener_arn = aws_lb_listener.http.arn
+  priority     = 2
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.api.arn
+  }
+
+  condition {
+    host_header {
+      values = ["support.ciscotechnologies.com", "support.*"]
+    }
+  }
+}
+
+# Route admin.* to API service
+resource "aws_lb_listener_rule" "admin_subdomain" {
+  listener_arn = aws_lb_listener.http.arn
+  priority     = 3
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.api.arn
+  }
+
+  condition {
+    host_header {
+      values = ["admin.ciscotechnologies.com", "admin.*"]
+    }
   }
 }

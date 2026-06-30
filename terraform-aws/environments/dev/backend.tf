@@ -4,8 +4,8 @@
 
 terraform {
   backend "s3" {
-    bucket         = "cisco-terraform-state-29062026"  # Change to unique name (S3 bucket names are globally unique)
-    key            = "prod/terraform.tfstate"
+    bucket         = "my-tf-test-bucket-3134"  # Change to unique name (S3 bucket names are globally unique)
+    key            = "dev/terraform.tfstate"
     region         = "us-east-1"
     encrypt        = true
   }

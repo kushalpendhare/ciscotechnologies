@@ -19,7 +19,12 @@ variable "vpc_cidr" {
   default = "10.0.0.0/16"
 }
 
-variable "container_port" {
+variable "frontend_port" {
+  type    = number
+  default = 80
+}
+
+variable "api_port" {
   type    = number
   default = 5000
 }

@@ -24,7 +24,7 @@ resource "random_password" "db_password" {
 resource "aws_db_instance" "postgres" {
   identifier     = "${var.project_name}-db"
   engine         = "postgres"
-  engine_version = "15.3"
+  engine_version = "14"
   instance_class = "db.t3.micro"  # Cost-optimized for learning
 
   # Storage
@@ -39,10 +39,10 @@ resource "aws_db_instance" "postgres" {
   # Network
   db_subnet_group_name   = aws_db_subnet_group.main.name
   vpc_security_group_ids = [var.rds_security_group_id]
-  publicly_accessible    = false  # Only accessible from ECS tasks
+  publicly_accessible    = true  # Only accessible from ECS tasks
 
   # Backup and maintenance
-  backup_retention_period = 7       # Keep 7 days of backups
+  backup_retention_period = 1       # Keep 1 day of backups
   backup_window           = "03:00-04:00"  # 3am UTC
   maintenance_window      = "mon:04:00-mon:05:00"
   skip_final_snapshot     = false   # Create final snapshot on destroy (safety)
@@ -92,7 +92,8 @@ resource "aws_db_parameter_group" "postgres" {
   # Example: adjust shared_buffers for 1GB instance
   parameter {
     name  = "shared_buffers"
-    value = "262144"  # ~2GB
+    value = "32768"  # ~256MB
+    apply_method = "pending-reboot"
   }
 
   tags = {

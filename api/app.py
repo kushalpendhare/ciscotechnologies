@@ -91,9 +91,9 @@ def sf_timer(operation):
 # without touching a single existing route.
 
 SECRET_KEY        = os.getenv("FLASK_SECRET_KEY", "cisco-dev-secret")
-DB_USER           = os.getenv("POSTGRES_USER", "cisco_admin")
-DB_PASS           = os.getenv("POSTGRES_PASSWORD", "Password123!")
-DB_NAME           = os.getenv("POSTGRES_DB", "cisco_architecture")
+DB_USER           = os.getenv("POSTGRES_USER", "ciscoAdmin")
+DB_PASS           = os.getenv("POSTGRES_PASSWORD", "CiscoAdmin123!")
+DB_NAME           = os.getenv("POSTGRES_DB", "ciscotech")
 DB_HOST           = os.getenv("DB_HOST", "db")
 SF_CLIENT_ID      = os.getenv("SF_CLIENT_ID", "")
 SF_CLIENT_SECRET  = os.getenv("SF_CLIENT_SECRET", "")
@@ -102,6 +102,11 @@ SF_PASSWORD_TOKEN = os.getenv("SF_PASSWORD_TOKEN", "")
 
 # ── DB ───────────────────────────────────────────────
 def get_db():
+
+    db_url = os.getenv("DATABASE_URL")
+    if db_url:
+        return psycopg2.connect(db_url)
+
     return psycopg2.connect(
         host=DB_HOST, database=DB_NAME,
         user=DB_USER, password=DB_PASS
